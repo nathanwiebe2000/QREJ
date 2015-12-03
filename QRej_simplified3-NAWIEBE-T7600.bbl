@@ -1,0 +1,176 @@
+\begin{thebibliography}{21}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\expandafter\ifx\csname bibnamefont\endcsname\relax
+  \def\bibnamefont#1{#1}\fi
+\expandafter\ifx\csname bibfnamefont\endcsname\relax
+  \def\bibfnamefont#1{#1}\fi
+\expandafter\ifx\csname citenamefont\endcsname\relax
+  \def\citenamefont#1{#1}\fi
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\providecommand{\bibinfo}[2]{#2}
+\providecommand{\eprint}[2][]{\url{#2}}
+
+\bibitem[{\citenamefont{Low et~al.}(2014)\citenamefont{Low, Yoder, and
+  Chuang}}]{LYC14}
+\bibinfo{author}{\bibfnamefont{G.~H.} \bibnamefont{Low}},
+  \bibinfo{author}{\bibfnamefont{T.~J.} \bibnamefont{Yoder}}, \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{I.~L.} \bibnamefont{Chuang}},
+  \bibinfo{journal}{Physical Review A} \textbf{\bibinfo{volume}{89}},
+  \bibinfo{pages}{062315} (\bibinfo{year}{2014}).
+
+\bibitem[{\citenamefont{Harrow et~al.}(2009)\citenamefont{Harrow, Hassidim, and
+  Lloyd}}]{HHL09}
+\bibinfo{author}{\bibfnamefont{A.~W.} \bibnamefont{Harrow}},
+  \bibinfo{author}{\bibfnamefont{A.}~\bibnamefont{Hassidim}}, \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{S.}~\bibnamefont{Lloyd}},
+  \bibinfo{journal}{Physical review letters} \textbf{\bibinfo{volume}{103}},
+  \bibinfo{pages}{150502} (\bibinfo{year}{2009}).
+
+\bibitem[{\citenamefont{Ozols et~al.}(2013)\citenamefont{Ozols, Roetteler, and
+  Roland}}]{ORR13}
+\bibinfo{author}{\bibfnamefont{M.}~\bibnamefont{Ozols}},
+  \bibinfo{author}{\bibfnamefont{M.}~\bibnamefont{Roetteler}},
+  \bibnamefont{and} \bibinfo{author}{\bibfnamefont{J.}~\bibnamefont{Roland}},
+  \bibinfo{journal}{ACM Transactions on Computation Theory (TOCT)}
+  \textbf{\bibinfo{volume}{5}}, \bibinfo{pages}{11} (\bibinfo{year}{2013}).
+
+\bibitem[{\citenamefont{Brassard et~al.}(2002)\citenamefont{Brassard, Hoyer,
+  Mosca, and Tapp}}]{BHM+02}
+\bibinfo{author}{\bibfnamefont{G.}~\bibnamefont{Brassard}},
+  \bibinfo{author}{\bibfnamefont{P.}~\bibnamefont{Hoyer}},
+  \bibinfo{author}{\bibfnamefont{M.}~\bibnamefont{Mosca}}, \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{A.}~\bibnamefont{Tapp}},
+  \bibinfo{journal}{Contemporary Mathematics} \textbf{\bibinfo{volume}{305}},
+  \bibinfo{pages}{53} (\bibinfo{year}{2002}).
+
+\bibitem[{\citenamefont{Grover}(1996)}]{Gro96}
+\bibinfo{author}{\bibfnamefont{L.~K.} \bibnamefont{Grover}}, in
+  \emph{\bibinfo{booktitle}{Proceedings of the twenty-eighth annual ACM
+  symposium on Theory of computing}} (\bibinfo{organization}{ACM},
+  \bibinfo{year}{1996}), pp. \bibinfo{pages}{212--219}.
+
+\bibitem[{\citenamefont{Boyer et~al.}(1996)\citenamefont{Boyer, Brassard,
+  H{\o}yer, and Tapp}}]{BGH+96}
+\bibinfo{author}{\bibfnamefont{M.}~\bibnamefont{Boyer}},
+  \bibinfo{author}{\bibfnamefont{G.}~\bibnamefont{Brassard}},
+  \bibinfo{author}{\bibfnamefont{P.}~\bibnamefont{H{\o}yer}}, \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{A.}~\bibnamefont{Tapp}},
+  \bibinfo{journal}{arXiv preprint quant-ph/9605034}  (\bibinfo{year}{1996}).
+
+\bibitem[{\citenamefont{Dagum and Luby}(1993)}]{dagum1993approximating}
+\bibinfo{author}{\bibfnamefont{P.}~\bibnamefont{Dagum}} \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{M.}~\bibnamefont{Luby}},
+  \bibinfo{journal}{Artificial intelligence} \textbf{\bibinfo{volume}{60}},
+  \bibinfo{pages}{141} (\bibinfo{year}{1993}).
+
+\bibitem[{\citenamefont{Liu and West}(2001)}]{liu_combined_2001}
+\bibinfo{author}{\bibfnamefont{J.}~\bibnamefont{Liu}} \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{M.}~\bibnamefont{West}}, in
+  \emph{\bibinfo{booktitle}{Sequential Monte Carlo Methods in Practice}},
+  edited by \bibinfo{editor}{\bibfnamefont{D.}~\bibnamefont{Freitas}}
+  \bibnamefont{and} \bibinfo{editor}{\bibfnamefont{N.}~\bibnamefont{Gordon}}
+  (\bibinfo{publisher}{Springer-Verlag, New York}, \bibinfo{year}{2001}),
+  \urlprefix\url{http://ftp.stat.duke.edu/WorkingPapers/99-14.html}.
+
+\bibitem[{\citenamefont{Minka}(2001)}]{minka2001expectation}
+\bibinfo{author}{\bibfnamefont{T.~P.} \bibnamefont{Minka}}, in
+  \emph{\bibinfo{booktitle}{Proceedings of the Seventeenth conference on
+  Uncertainty in artificial intelligence}} (\bibinfo{organization}{Morgan
+  Kaufmann Publishers Inc.}, \bibinfo{year}{2001}), pp.
+  \bibinfo{pages}{362--369}.
+
+\bibitem[{\citenamefont{Van Der~Merwe et~al.}(2000)\citenamefont{Van Der~Merwe,
+  Doucet, De~Freitas, and Wan}}]{van2000unscented}
+\bibinfo{author}{\bibfnamefont{R.}~\bibnamefont{Van Der~Merwe}},
+  \bibinfo{author}{\bibfnamefont{A.}~\bibnamefont{Doucet}},
+  \bibinfo{author}{\bibfnamefont{N.}~\bibnamefont{De~Freitas}},
+  \bibnamefont{and} \bibinfo{author}{\bibfnamefont{E.}~\bibnamefont{Wan}}, in
+  \emph{\bibinfo{booktitle}{NIPS}} (\bibinfo{year}{2000}), pp.
+  \bibinfo{pages}{584--590}.
+
+\bibitem[{\citenamefont{Kitaev and Webb}(2008)}]{KW08}
+\bibinfo{author}{\bibfnamefont{A.}~\bibnamefont{Kitaev}} \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{W.~A.} \bibnamefont{Webb}},
+  \bibinfo{journal}{arXiv preprint arXiv:0801.0342}  (\bibinfo{year}{2008}).
+
+\bibitem[{\citenamefont{Cleve and Watrous}(2000)}]{CW00}
+\bibinfo{author}{\bibfnamefont{R.}~\bibnamefont{Cleve}} \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{J.}~\bibnamefont{Watrous}}, in
+  \emph{\bibinfo{booktitle}{Foundations of Computer Science, 2000. Proceedings.
+  41st Annual Symposium on}} (\bibinfo{organization}{IEEE},
+  \bibinfo{year}{2000}), pp. \bibinfo{pages}{526--536}.
+
+\bibitem[{\citenamefont{Kliuchnikov et~al.}(2013)\citenamefont{Kliuchnikov,
+  Maslov, and Mosca}}]{KMM13}
+\bibinfo{author}{\bibfnamefont{V.}~\bibnamefont{Kliuchnikov}},
+  \bibinfo{author}{\bibfnamefont{D.}~\bibnamefont{Maslov}}, \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{M.}~\bibnamefont{Mosca}},
+  \bibinfo{journal}{Quantum Information \& Computation}
+  \textbf{\bibinfo{volume}{13}}, \bibinfo{pages}{607} (\bibinfo{year}{2013}).
+
+\bibitem[{\citenamefont{Lloyd et~al.}(2014)\citenamefont{Lloyd, Mohseni, and
+  Rebentrost}}]{LMR14}
+\bibinfo{author}{\bibfnamefont{S.}~\bibnamefont{Lloyd}},
+  \bibinfo{author}{\bibfnamefont{M.}~\bibnamefont{Mohseni}}, \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{P.}~\bibnamefont{Rebentrost}},
+  \bibinfo{journal}{Nature Physics} \textbf{\bibinfo{volume}{10}},
+  \bibinfo{pages}{631} (\bibinfo{year}{2014}).
+
+\bibitem[{\citenamefont{Grover and Rudolph}(2002)}]{GR02}
+\bibinfo{author}{\bibfnamefont{L.}~\bibnamefont{Grover}} \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{T.}~\bibnamefont{Rudolph}},
+  \bibinfo{journal}{arXiv preprint quant-ph/0208112}  (\bibinfo{year}{2002}).
+
+\bibitem[{\citenamefont{Wiebe et~al.}(2014{\natexlab{a}})\citenamefont{Wiebe,
+  Granade, Ferrie, and Cory}}]{wiebe_Hamiltonian_2014}
+\bibinfo{author}{\bibfnamefont{N.}~\bibnamefont{Wiebe}},
+  \bibinfo{author}{\bibfnamefont{C.}~\bibnamefont{Granade}},
+  \bibinfo{author}{\bibfnamefont{C.}~\bibnamefont{Ferrie}}, \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{D.}~\bibnamefont{Cory}},
+  \bibinfo{journal}{Physical Review Letters} \textbf{\bibinfo{volume}{112}},
+  \bibinfo{pages}{190501} (\bibinfo{year}{2014}{\natexlab{a}}),
+  \urlprefix\url{http://link.aps.org/doi/10.1103/PhysRevLett.112.190501}.
+
+\bibitem[{\citenamefont{Childs and Wiebe}(2012)}]{CW12}
+\bibinfo{author}{\bibfnamefont{A.~M.} \bibnamefont{Childs}} \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{N.}~\bibnamefont{Wiebe}},
+  \bibinfo{journal}{Quantum Information \& Computation}
+  \textbf{\bibinfo{volume}{12}}, \bibinfo{pages}{901} (\bibinfo{year}{2012}).
+
+\bibitem[{\citenamefont{Brassard et~al.}(2000)\citenamefont{Brassard, Hoyer,
+  Mosca, and Tapp}}]{BHT+00}
+\bibinfo{author}{\bibfnamefont{G.}~\bibnamefont{Brassard}},
+  \bibinfo{author}{\bibfnamefont{P.}~\bibnamefont{Hoyer}},
+  \bibinfo{author}{\bibfnamefont{M.}~\bibnamefont{Mosca}}, \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{A.}~\bibnamefont{Tapp}},
+  \bibinfo{journal}{arXiv preprint quant-ph/0005055}  (\bibinfo{year}{2000}).
+
+\bibitem[{\citenamefont{Isard and
+  Blake}(1998)}]{isard_condensationconditional_1998}
+\bibinfo{author}{\bibfnamefont{M.}~\bibnamefont{Isard}} \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{A.}~\bibnamefont{Blake}},
+  \bibinfo{journal}{International Journal of Computer Vision}
+  \textbf{\bibinfo{volume}{29}}, \bibinfo{pages}{5} (\bibinfo{year}{1998}),
+  ISSN \bibinfo{issn}{0920-5691, 1573-1405},
+  \urlprefix\url{http://link.springer.com/article/10.1023/A%3A1008078328650}.
+
+\bibitem[{\citenamefont{Wiebe et~al.}(2014{\natexlab{b}})\citenamefont{Wiebe,
+  Kapoor, and Svore}}]{wiebe_quantum_2014}
+\bibinfo{author}{\bibfnamefont{N.}~\bibnamefont{Wiebe}},
+  \bibinfo{author}{\bibfnamefont{A.}~\bibnamefont{Kapoor}}, \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{K.~M.} \bibnamefont{Svore}},
+  \bibinfo{journal}{arXiv preprint arXiv:1412.3489}
+  (\bibinfo{year}{2014}{\natexlab{b}}).
+
+\bibitem[{\citenamefont{Wiebe et~al.}(2014{\natexlab{c}})\citenamefont{Wiebe,
+  Granade, Ferrie, and Cory}}]{WGF+14}
+\bibinfo{author}{\bibfnamefont{N.}~\bibnamefont{Wiebe}},
+  \bibinfo{author}{\bibfnamefont{C.}~\bibnamefont{Granade}},
+  \bibinfo{author}{\bibfnamefont{C.}~\bibnamefont{Ferrie}}, \bibnamefont{and}
+  \bibinfo{author}{\bibfnamefont{D.}~\bibnamefont{Cory}},
+  \bibinfo{journal}{Physical review letters} \textbf{\bibinfo{volume}{112}},
+  \bibinfo{pages}{190501} (\bibinfo{year}{2014}{\natexlab{c}}).
+
+\end{thebibliography}
