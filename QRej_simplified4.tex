@@ -113,12 +113,22 @@ Proof of~#1.}}
 
 \newcommand{\id}{\openone}
 %\newcommand{\id}{\mathbb{I}}
+
+
 \title{Efficient Online Quantum Bayesian Inference}
 \author{Nathan Wiebe$^\dagger$}
 \author{Christopher Granade$^{*+}$}
 \affiliation{$^\dagger$Quantum Architectures and Computation Group, Microsoft Research, Redmond, WA (USA)}
-\affiliation{$^*$Institute for quantum computing, Waterloo, ON (Canada)}
-\affiliation{$^+$Center for engineered quantum systems, Sydney, NSW (Australia)}
+\affiliation{
+    $^*$Centre for Engineered Quantum Systems,
+    University of Sydney,
+    Sydney, NSW, Australia
+}
+\affiliation{
+    $^+$School of Physics,
+    University of Sydney,
+    Sydney, NSW, Australia
+}
 \begin{abstract}
 We present a new quantum algorithm for online quantum approximate Bayesian inference that can efficiently estimate the low order moments of the posterior distribution in an online setting modulo reasonable assumptions on the likelihood function.  Our method does so by sampling from the distribution over these single hypotheses to learn a simple model for the posterior distribution, which allows our algorithm to learn in an online fashion without measurement errors causing the posterior distribution to be lost.  We further show that the success probability of our algorithm is essentially optimal by showing that an asymptotic improvement to the algorithm's success probability would violate lower bounds for unstructured search and also provide quantum methods for adaptive experiment design and learning in the presence of stochastically varying latent variables.\end{abstract}
 \maketitle
