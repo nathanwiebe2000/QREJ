@@ -186,7 +186,7 @@ Using a single call to $O_E$ and adding a sufficient number of ancilla qubits, w
 \begin{equation}
 \sum_x \sqrt{P(x)} \ket{x} \ket{P(E|x)}\ket{0}.
 \end{equation}
-Then by applying $R_y(2 \sin^{-1}(P(E|x)/\Gamma_E))$ to the ancilla qubit we can enact
+Then by applying the rotation $R_y(2 \sin^{-1}(P(E|x)/\Gamma_E))$ to the ancilla qubit, controlled on the register representing $\ket{P(E|x)}$, we can enact
 \begin{equation}
 \sum_x \sqrt{P(x)} \ket{x} \ket{P(E|x)}\ket{0}\mapsto \sum_x \sqrt{P(x)} \ket{x} \ket{P(E|x)}\left(\sqrt{\frac{P(E|x)}{\Gamma_E}}\ket{1} + \sqrt{1-\frac{P(E|x)}{\Gamma_E}}\ket{0} \right).\label{eq:rejection}
 \end{equation}
@@ -194,7 +194,7 @@ Next the right most qubit register is measured and if a result of $1$ is obtaine
 \begin{equation}
 \frac{\sum_{x} \sqrt{P(x) P(E|x)}\ket{x}}{\sqrt{\sum_x P(x)P(E|x)}},
 \end{equation}
-which gives a probability distribution that corresponds to that expected by Bayes' rule.  The probability of this occurring is $\sum_x P(x) P(E|x) /\Gamma_E$.
+which gives a probability distribution that corresponds to that expected by Bayes' rule.  The probability of this occurring is $\sum_x P(x) P(E|x) /\Gamma_E = \langle P(x), P(E|x) \rangle / \Gamma_E$.
 
 Since the process is heralded, amplitude amplification can be used to boost the probability of success for the successful branch quadratically~\cite{BHM+02}.  Thus the average number of queries is in $O(\sqrt{\Gamma_E/\langle P(x), P(E|x)\rangle})$ as claimed.
 \end{proof}
@@ -224,20 +224,20 @@ The reason why the errors in quantum rejection sampling cannot, in general, be e
 Grover's problem with $N$ items and $m$ marked items reduces to Bayesian inference on a prior on $\mathbb{R}^N$.
 \end{lemma}
 \begin{proof}
-Let $O$ be a Boolean function that takes the value $1$ iff $x\in X_m$ where $|X_m|=m$.  Identifying the set $X_m$ by querying this function is equivalent to Grover's problem.  Consider the following likelihood function on a two--outcome space where $1$ corresponds to finding a marked state and $0$ corresponds to finding an un--marked state:
+Let $O_G$ be a Boolean function that takes the value $1$ iff $x\in X_m$ where $|X_m|=m$.  Identifying the set $X_m$ by querying this function is equivalent to Grover's problem.  Consider the following likelihood function on a two--outcome space where $1$ corresponds to finding a marked state and $0$ corresponds to finding an un--marked state:
 \begin{equation}
 P(1|x) = \begin{cases} 1 & {\rm if~}x\in X_m\\ 0& {\rm otherwise} \end{cases}.\label{eq:reduceLikelihood}
 \end{equation}
 We also have that $P(0|x)=1-P(1|x)$, but this fact is not needed for the proof.
 
-It is then easy to see that $P(1|x)=O(x)$ and thus a likelihood evaluation is equivalent to a query to $O$.  This means that we can solve Grover's problem using the following algorithm.  \begin{enumerate}
+It is then easy to see that $P(1|x)=O_G(x)$ and thus a likelihood evaluation is equivalent to a query to $O_G$.  This means that we can solve Grover's problem using the following algorithm.  \begin{enumerate}
 \item Set the prior to be $P(x) = 1/N$.
 \item Set $E=1$, which corresponds to pretending that an experiment was performed that found a marked entry.  
 \item Compute $P(x|E) \propto P(E|x)P(x)$.  
 \item Output all $x$ such that $P(x|E)=1/m$.
 \end{enumerate}
 
-The validity of this algorithm is easy to verify from~\eq{Bayes} and it is clear that the posterior distribution is a uniform distribution over $x\in X_m$.  Since $|X_m|=m$ and $P(x)$ is uniform, all elements in the support of the posterior distribution have probability $1/m$ and thus Grover's problem can be solved using Bayesian inference.  This algorithm will succeed classically using $N$ queries to $O$, rather than the $N-m$ queries required in the worst case scenario if a Bayesian framework is not adopted.
+The validity of this algorithm is easy to verify from~\eq{Bayes} and it is clear that the posterior distribution is a uniform distribution over $x\in X_m$.  Since $|X_m|=m$ and $P(x)$ is uniform, all elements in the support of the posterior distribution have probability $1/m$ and thus Grover's problem can be solved using Bayesian inference.  This algorithm will succeed classically using $N$ queries to $O_G$, rather than the $N-m$ queries required in the worst case scenario if a Bayesian framework is not adopted.
 
 
 \end{proof}
@@ -270,7 +270,7 @@ Thus~\eq{Bayes} gives that the posterior probability after measuring $1$ is
 Therefore $O(\log(N))$ measurements of $1$ suffice to amplify the probability from $1/N$ to $\Theta(1)$.  
 
 In practice, it would be unlikely that $O(\log(N))$ sequential measurements would all yield $1$ (i.e. give noisy information about the marked state), but the user of a quantum Bayesian updating algorithm can always pretend that this sequence of observations was obtained similar to~\lem{reduce}. 
-Given the observable variables follows this sequence~\lem{rejection} shows that 
+Given the observable variables follow this sequence, \lem{rejection} shows that 
 there exists a quantum algorithm that can perform each such update with probability of success
 \begin{equation}
 \Omega\left(\sqrt{\sum_x |\alpha_x|^2 P(1|x)}\right) \in \Omega(1),\label{eq:Pfail}
@@ -285,7 +285,7 @@ Since $O(\log(N))$ such queries are made in the inference process, the marked st
 to the likelihood function is equivalent to a query to Grover's oracle, an inexpensive error correction algorithm is also impossible for algorithms with complexity similar to that of~\lem{rejection}.
 \end{proof}
 
-These impossibility results show that the quantum updating procedure of~\cite{LYC14} and~\lem{rejection} cannot be improved  without making assumptions about the underlying prior distributions or likelihood functions.  This inneficiency is perhaps unsurprising as exact Bayesian inference is also classically inefficient.  In particular, an efficient sampling algorithm from a distribution that is a close approximation to the  posterior distribution would imply $\P=\NP$~\cite{dagum1993approximating}.  A quantum algorithm capable of efficient Bayesian inference for general models would similarly imply that $\NP \subseteq \BQP$, which is false under reasonable complexity theoretic conjectures.
+These impossibility results show that the quantum updating procedure of~\cite{LYC14} and~\lem{rejection} cannot be improved  without making assumptions about the underlying prior distributions or likelihood functions.  This inefficiency is perhaps unsurprising as exact Bayesian inference is also classically inefficient.  In particular, an efficient sampling algorithm from a distribution that is a close approximation to the  posterior distribution would imply $\P=\NP$~\cite{dagum1993approximating}.  A quantum algorithm capable of efficient Bayesian inference for general models would similarly imply that $\NP \subseteq \BQP$, which is false under reasonable complexity theoretic conjectures.
 
 Although it may not be surprising that quantum Bayesian updating is not generically efficient, it is perhaps surprising that both it and classical updating fail to be efficient for different reasons.  Classical Bayesian updating fails to be efficient because it needs to store prior and posterior probabilities for an exponentially large number of hypotheses; however, its cost scales linearly with the number of updates used.  In contrast, quantum Bayesian updating scales polynomially with the number of hypotheses considered but scales exponentially with the number of updates.  This begs the question of whether it is possibile to combine the best features of quantum and classical Bayesian updating.  We do so in the subsequent section, wherein we show how a classical model can be stored for the system that can be reverted to in the event that a failure is observed in a quantum Bayesian update.
 
@@ -324,8 +324,8 @@ Although it may not be surprising that quantum Bayesian updating is not generica
 \section{Semi--classical Bayesian updating}
 Approximations are therefore often needed to make both classical as well as quantum Bayesian inference tractable.  However, the purpose of these approximations is very different.  Classical methods struggle when dealing with probability distributions in high--dimensional spaces, and sophisticated methods like sequential Monte--Carlo approximations are often employed to reduce the effective dimension~\cite{liu_combined_2001,minka2001expectation,van2000unscented}.  However, the non--linear nature of the update rule and the problem of extracting information from the posterior distribution are not issues in the classical setting.  Our quantum algorithm has the exact opposite strengths and weaknesses: it can easily cope with exponentially large spaces but struggles emulating the non-linear nature of the update rule.
 
-We attack the problem by making our quantum algorithm a little more classical, meaning that through out the learning process we aim to learn an approximate classical model for the posterior alongside the quantum algorithm.  This classical model allowsus to approximately re--prepare the state should an update fail throughout the updating process.  This removes the exponential scaling, but results in an approximate inference.  We refer to this procedure as \emph{quantum resampling} as it is reminiscent of resampling in sequential Monte--Carlo algorithms or other particle filter methods such as ADF~\cite{minka2001expectation}.  In order to prepare the distribution
-The posterior distribution is modeled as a Gaussian distribution with mean and covariance equal to that of the true posterior.  This choice is sensible because once the Gaussian distribution is specified, the Grover--Rudolph state preparation method can be used to prepare such states as their cummulative distribution functions can be efficiently computed.
+We attack the problem by making our quantum algorithm a little more classical, meaning that through out the learning process we aim to learn an approximate classical model for the posterior alongside the quantum algorithm.  This classical model allowsus to approximately re--prepare the state should an update fail throughout the updating process.  This removes the exponential scaling, but results in an approximate inference.  We refer to this procedure as \emph{quantum resampling} as it is reminiscent of resampling in sequential Monte--Carlo algorithms or other particle filter methods such as ADF~\cite{minka2001expectation}.  In order to prepare the distribution,
+we model the posterior distribution as a Gaussian distribution with mean and covariance equal to that of the true posterior.  This choice is sensible because once the Gaussian distribution is specified, the Grover--Rudolph state preparation method can be used to prepare such states as their cumulative distribution functions can be efficiently computed.
 Alternatively, for one--dimensional problems, such states could be manufactured by approximate cloning.
 
 We define a semi--classical Bayesian update below 
@@ -333,7 +333,7 @@ We define a semi--classical Bayesian update below
 A semi--classical Bayesian update of a prior state on $\mathbb{C}^N$, for a discrete observable variable $E$, likelihood function $P(E|x)$ and family of probability distributions $F(x;\rho)$ parameterized by the vector $\rho$, maps 
 $$\sum_x \sqrt{P(x)} \ket{x}\mapsto \rho: F(x;\rho) \approx P(x|E). $$\label{def:semi}
 \end{definition}
-We call this process semi--classical updating because it yields an approximate classical model for the posterior distribution.  This model can take many forms in principle, but for example we could consider this model to be a Gaussian distribution that has the same mean and standard deviation as the posterior distribution.
+We call this process semi--classical updating because it yields an approximate classical model for the posterior distribution.  This model can take many forms in principle; as an example, we could consider this model to be a Gaussian distribution that has the same mean and standard deviation as the posterior distribution.
 Semi--classical Bayesian updating will be discussed in more detail in the following section, but for now we will focus on quantum Bayesian updating.
 
 %The first assumption that we make is that the prior distribution is a Gaussian.  This assumption is useful for two reasons.  Firstly, the prior distribution is completely specified via its mean and covariance matrix.  Secondly, in practice, non--degenerate learning problems tend to lead to posterior distributions that approach a Gaussian distribution about the true model parameters.  This is significant because it shows that, for a wide class of physically reasonable models for the posterior, the resultant state can be learned efficiently and cloned.  This is significant because it means that if a failure occurs then the prior can be efficiently re-prepared using the Grover--Rudolph state preparation method and the update can be attempted again.
@@ -369,7 +369,7 @@ In particular, using $\lambda_x = x$ in~\lem{ampest} yields the mean $x_0$.  The
 
 
 \begin{corollary}
-Assume that the components of the mean of the prior distribution over model vectors are $\{\lambda_{0,j}:j=1\ldots D\}$ and $\Delta \lambda \ge \max_j |\langle \Lambda_j \rangle-\lambda_{0,j}|$.  The mean and covariance matrix can be computed within error $\epsilon$ using $\tilde{O}\left(\frac{D^2\Delta \lambda \Gamma_E}{\epsilon \langle w, P(E|x)\rangle}\right)$ queries to $O_E$.\label{cor:method}
+Assume that the components of the mean of the prior distribution over model vectors are $\{\lambda_{0,j}:j=1\ldots D\}$ and $\Delta \lambda \ge \max_j |\langle \Lambda_j \rangle-\lambda_{0,j}|$.  The mean and covariance matrix can be computed within error $\epsilon$ using $\tilde{O}\left(\frac{D^2\Delta \lambda \Gamma_E}{\epsilon \langle P(x), P(E|x)\rangle}\right)$ queries to $O_E$.\label{cor:method}
 \end{corollary}
 \begin{proof}
 In order to apply the reasoning of~\lem{ampest} to estimate the posterior mean and variance, we need to prepare the following state conditioned on evidence $E$
@@ -395,7 +395,7 @@ The result then follows from noting that there are $O(D^2)$ different values of 
 \end{proof}
 This shows that if we require modest relative error (i.e. $\Delta \lambda \in O(\epsilon)$) and $\Gamma_E$ is reasonably tight then this process is highly efficient.  In contrast, previous results that do not use these factors that incorporate apriori knowledge of the scale of these terms may not be efficient under such assumptions.
 
-Below we combine these ideas to construct an online quantum algorithm that is capable of efficiently processing a series of $L$ pieces of data before outputting a classical model for the posterior distribution in the quantum device.  This result is key to our argument because it provides a result that one can fall back on if an update fails, thereby removing the problem f exponentially shrinking success probability at the price of only retaining incomplete information about the posterior distribution.
+Below we combine these ideas to construct an online quantum algorithm that is capable of efficiently processing a series of $L$ pieces of data before outputting a classical model for the posterior distribution in the quantum device.  This result is key to our argument because it provides a result that one can fall back on if an update fails, thereby removing the problem of exponentially shrinking success probability at the price of only retaining incomplete information about the posterior distribution.
 
 \begin{theorem}
 Let $F(x;\mu, \Sigma)$ be a family of approximations to the posterior distribution parameterized by the posterior mean $\mu$ and the posterior covariance matrix $\Sigma$ and $\{E_k: k=1,\ldots L\}$ be a set of $L$ observable variables.  Then a semi--classical update of a quantum state $\sum_x \sqrt{P(x)} \ket{x}$ can be performed using a number of queries to $O_E$ that is in
@@ -428,7 +428,7 @@ where $N_{\rm part}$ is the number of particles in the SMC cloud approximating t
 As a final note, since amplitude estimation is used liberally in these protocols it is important to reduce the cost of this algorithm as much as possible.  Although amplitude estimation is near-optimal it does not by default use prior information that can be used to accelerate the learning process.  Below we formally prove a theorem, which is proposed informally in~\cite{WHW15}.
 
 \begin{theorem}
-Let $U$ be a unitary operator such that $U\ket{0}=\sqrt{a}\ket{\phi} + \sqrt{1-a}\ket{\phi^\perp}$ where $\braket{\phi}{\phi^\perp}=0$ for $0<a\le a_0<1$, $1-a_0\in \Theta(1)$ and let $G$ be a projector such that $S\ket{\phi}=-\ket{\phi}$ and $S\ket{\phi^\perp}=\ket{\phi^\perp}$.  Then $a$ can be estimated to within error $\epsilon$ using $\tilde{O}(\sqrt{a_0}/\epsilon)$ applications of $S$ with high probability.\label{thm:priorAmpEst}
+Let $U$ be a unitary operator such that $U\ket{0}=\sqrt{a}\ket{\phi} + \sqrt{1-a}\ket{\phi^\perp}$ where $\braket{\phi}{\phi^\perp}=0$ for $0<a\le a_0<1$, $1-a_0\in \Theta(1)$ and let $S$ be a projector such that $S\ket{\phi}=-\ket{\phi}$ and $S\ket{\phi^\perp}=\ket{\phi^\perp}$.  Then $a$ can be estimated to within error $\epsilon$ using $\tilde{O}(\sqrt{a_0}/\epsilon)$ applications of $S$ with high probability.\label{thm:priorAmpEst}
 \end{theorem}
 \begin{proof}
 Our proof follows the same intuition as that of the proof of amplitude estimation in~\cite{BHM+02} except rather than performing amplitude estimation on $U\ket{0}$ we use amplitude amplification to first boost the probability and then use amplitude estimation to learn the boosted probability.  The actual value of $a$ is then inferred from the amplified value of $a$ learned in the amplitude estimation step.
@@ -447,7 +447,7 @@ If there is an error of $O(\delta)$ in $y$ then Taylor analysis implies that
 \begin{equation}
 a=\sin^2\left(\frac{\sin^{-1}(\sqrt{y})}{2m+1}\right) + O\left(\frac{\delta}{m^2\sqrt{1-a}} \right).
 \end{equation}
-Since $a<1$ the error is $O(\delta/m^2)$.  Hence if we desire error $\epsilon$ in $a$ then it suffices to take $\delta\in O(\epsilon m^2)$.  Thus $\tilde O(1/\epsilon m)$ applications of $G$ are needed to infer $a$ to within error $\epsilon$.
+Since $a<1$ the error is $O(\delta/m^2)$.  Hence if we desire error $\epsilon$ in $a$ then it suffices to take $\delta\in O(\epsilon m^2)$.  Thus $\tilde O(1/\epsilon m)$ applications of $S$ are needed to infer $a$ to within error $\epsilon$.
 
 Although this may seem to suggest that taking large $m$ always leads to a better inference of $a$, this is not necessarily true for this inversion process.  This is because if 
 \begin{equation}
@@ -537,7 +537,7 @@ convolution allows us to filter the prior distribution.
 Let  $O_{\hat{Q}}$ be a quantum oracle such that $O_{\hat{Q}}\ket{x} \ket{y} = \ket{x} \ket{y\oplus \sin^{-1}(\hat{Q} (x)/\Gamma_E)}$ where $\hat{Q}:=\mathcal{F}(Q)$ and $\hat{Q}(x)\le \Gamma_E$ and $Q(x) \in \mathbb{C}^{2^n}$.  Then given access to a unitary oracle $O_{\rm in}$ that prepares the state $\sum_x \sqrt{P(x)}\ket{x}$, the state $\sum_x \sqrt{(P\star Q) (x)}\ket{x}$ can be prepared with error $\epsilon$ in the $2$--norm using a number of queries that has an average-case query complexity of $O(\sqrt{\Gamma_E/ \langle \mathcal{F}(P), \mathcal{F}(Q)}\rangle)$ and requires on average $O(n \log(n/\epsilon)\sqrt{\Gamma_E/\langle \mathcal{F}(P), \mathcal{F}(Q)}\rangle)$ one-- and two--qubit gates from the set $\{H,P(\theta),\Lambda (P(\theta))\}$ where $P(\theta):\ket{x}\mapsto e^{2\pi i \theta x} \ket{x}$ for $\theta \in \{y/2^n:y\in \mathbb{Z}_{2^n}\}$ and $\Lambda (P(\theta))$ is its controlled counterpart.
 \end{theorem}
 \begin{proof}
-Notice, however, that Bayes updating the quantum SMC state consists of pointwise multiplication. As a result, applying \lem{rejection} in the Fourier domain, we can implement the convolution described above.  Doing so involves the following process
+Notice that Bayes updating the quantum SMC state consists of pointwise multiplication. As a result, applying \lem{rejection} in the Fourier domain, we can implement the convolution described above.  Doing so involves the following process
 \begin{enumerate}
 \item  Fourier transform the current posterior, $\ket{P}:=\sum_x P(x) \ket{x} \mapsto \hat{\mathcal{F}}\left(\sum_x P(x) \ket{x} \right):= \sum_k \omega_k \ket{k}$.
 \item Prepare the Fourier-domain representation of the convolution kernel, \\$\sum_k \omega_k \ket{k}\mapsto \sum_k \omega_k \ket{k}\ket{\sin^{-1}(\sqrt{\hat{Q}(k)/\Gamma_E})}$.
@@ -615,7 +615,7 @@ The derivatives of $\mathcal{U}$ can then be approximated for small but finite $
 Thus if $c$ consists of $C$ different components then $O(C)$ calculations of the utility function are needed to estimate the gradient for a finite value of $h$.
 This is the intuition behind our method, the performance of which is given in the following theorem.
 \begin{theorem}
-Assume that the prior distribution $P(x)$ has support only on the interval $x\in [0,1]$ and that the observable varible $E$ has support only on $D$ distinct values then each component of the gradient of $\mathcal{U}$ can be computed within error $\epsilon$ using on average $\tilde{O}\left(D\sqrt{\max_{c,j}\left|\frac{\partial^3 U(c)}{\partial c_j^3} \right|}/\epsilon^{3/2}\right)$ queries to the likelihood function and the prior, for $\epsilon \le \min_d \int P(d|x)P(x) \mathrm{d}x/2$.
+Assume that the prior distribution $P(x)$ has support only on the interval $x\in [0,1]$ and that the observable varible $E$ has support only on $D$ distinct values; then each component of the gradient of $\mathcal{U}$ can be computed within error $\epsilon$ using on average $\tilde{O}\left(D\sqrt{\max_{c,j}\left|\frac{\partial^3 U(c)}{\partial c_j^3} \right|}/\epsilon^{3/2}\right)$ queries to the likelihood function and the prior, for $\epsilon \le \min_d \int P(d|x)P(x) \mathrm{d}x/2$.
 \end{theorem}
 \begin{proof}
 The utility function can be directly computed on a quantum computer, but doing
@@ -722,7 +722,7 @@ In order to learn the mean from such a state without destroying it, we need to a
 \end{equation}
 where $\bar{x}$ is an approximation to the mean that is truncated to give error $\Delta\le \mu$.  For simplicity, we drop the explicit dependence of $\bar{x}$ on $x$ in the following.
 
-Let $\mu= \sum_j P(x_j) x_j$ be the true mean.  Then as each of the distributions over the constituent $x_j$ is independent and assuming that $x_j \le X_{\rm max}$, the chernoff bound states that
+Let $\mu= \sum_j P(x_j) x_j$ be the true mean.  Then as each of the distributions over the constituent $x_j$ is independent and assuming that $x_j \le X_{\rm max}$, the Chernoff bound states that
 \begin{equation}
 P\left(\left|\bar{x} - \mu\right|\ge \Delta \right)\le e^{-\frac{\Delta^2 K}{3\mu X_{\rm max}}}.
 \end{equation}
