@@ -130,12 +130,13 @@ Proof of~#1.}}
     Sydney, NSW, Australia
 }
 \begin{abstract}
-We present a new quantum algorithm for approximate Bayesian inference that can efficiently estimate the low order moments of the posterior distribution in an online setting modulo reasonable assumptions on the likelihood function.  Our method does so by sampling from the distribution over these single hypotheses to learn a simple model for the posterior distribution, which allows our algorithm to learn in an online fashion without measurement errors causing the posterior distribution to be lost.  We further show that the success probability of our algorithm is essentially optimal by showing that an asymptotic improvement to the algorithm's success probability would violate lower bounds for unstructured search and also provide quantum methods for adaptive experiment design and learning in the presence of stochastically varying latent variables.\end{abstract}
+We present a new quantum algorithm for approximate Bayesian inference that can efficiently estimate the low order moments of the posterior distribution in an online setting modulo reasonable assumptions on the likelihood function.  Our method does so by using a non-deterministic quantum algorithm to infer a simple model for the posterior distribution, which allows it to efficiently learn in an online fashion without measurement errors causing the posterior distribution to be lost.  We further show that the success probability of our algorithm is optimal in the sense that an asymptotic improvement to the algorithm's success probability would violate lower bounds for unstructured search and also provide quantum methods for adaptive experiment design and learning in the presence of stochastically varying latent variables.
+\end{abstract}
 \maketitle
 \section{Introduction}
 Data processing has emerged within the last few years to be a problem of central importance within both academic circles and industry.  The need for ever more sophisticated methods for processing data arose from the fact that modern experiments produce huge amounts of data and properly inferring information from huge data sets can require substantial computational power.  A natural question to ask is whether quantum technologies can help quell the insatiable demand on computational time that statistical inference creates.  We present here evidence that quantum computing can be used to speed up statistical inference relative to classical methods and show that limits exist on the extent to which such methods can be accelerated.  
 
-In particular, we focus on accelerating Bayesian inference.  Bayes' rule is the heart of Bayesian inference, which gives the correct way to update a prior distribution that describes the experimentalist's initial beliefs about a system model when a piece of experimental evidence is received.  If $E$ be a piece of evidence (an observable variable) and $x$ denotes a candidate model for the experimental system (a latent or hidden variable) then Bayes' rule states that the probability that the model is valid given the evidence (denoted $P(x|E)$) is 
+In particular, we focus on accelerating Bayesian inference.  Bayes' rule is the heart of Bayesian inference, which gives the correct way to update a prior distribution that describes the users' initial beliefs about a system model when a piece of experimental evidence is received.  If $E$ be a piece of evidence (an observable variable) and $x$ denotes a candidate model for the experimental system (a latent or hidden variable) then Bayes' rule states that the probability that the model is valid given the evidence (denoted $P(x|E)$) is 
 \begin{equation}
 P(x|E)= \frac{P(E|x) P(x)}{\int_x P(E|x) P(x)\mathrm{d}x}= \frac{P(E|x) P(x)}{\langle P(E|x), P(x) \rangle},\label{eq:Bayes}
 \end{equation}
@@ -245,14 +246,15 @@ The validity of this algorithm is easy to verify from~\eq{Bayes} and it is clear
 This reduction of Grover's problem to Bayesian inference brings with it tight lower bounds on the query complexity of solving the problem~\cite{BGH+96}.  This means that we can exploit these bounds to show limitations on our ability to perform Bayesian inference on a quantum computer and also our ability to correct erroneous measurements that occur in the application of the method of~\lem{rejection}.  The following theorem states two such restrictions, which show that the method of~\lem{rejection} cannot be trivially improved nor can its failures be inexpensively corrected.
 
 \begin{theorem}
-The following are impossible.
+Let $F$ be a blackbox quantum update algorithm that performs a quantum Bayesian update on an arbitrary pure state $\sum_{x=1}^N \alpha_x \ket{x}$ using $O(1)$ queries to the oracle $O_E$ and has success probability $\Omega(\sqrt{\sum_x |\alpha_x|^2 P(E|x)/\Gamma_E})$ for $\Gamma_E \le \max_x P(E|x)\le 1$.  The following are impossible.
 \begin{enumerate}
-\item An algorithm capable of performing a quantum Bayesian update of an arbitrary pure quantum state of the form $\sum_{x=1}^N \alpha_x \ket{x}$ using $O(1)$ queries to $O_E$ with success probability $\omega(\sqrt{\sum_x |\alpha_x|^2 P(E|x)/\Gamma_E})$.
-\item An algorithm that requires $o(\sqrt{N}/\log(N))$ queries to $O_E$ to correct a failure of an algorithm that performs a quantum Bayesian update on $\sum_{x=1}^N \alpha_x \ket{x}$ using $O(1)$ queries with probability of success $\Omega(\sqrt{\sum_x |\alpha_x|^2 P(E|x)/\Gamma_E})$.
+\item A blackbox algorithm $G$ capable of performing a quantum Bayesian update of an arbitrary pure quantum state of the form $\sum_{x=1}^N \alpha_x \ket{x}$ that uses $O(1)$ queries to $O_E$ and has  success probability $\omega(\sqrt{\sum_x |\alpha_x|^2 P(E|x)/\Gamma_E})$.
+\item A blackbox algorithm $H$ that requires $o(\sqrt{N}/\log(N))$ queries to $O_E$ to undo the effects of algorithm $F$ applies to the arbitrary state $\sum_{x=1}^N \alpha_x \ket{x}$ upon a failed update.
+\item A blackbox algorithm $I$ capable of performing a quantum Bayesian update of an arbitrary pure quantum state of the form $\sum_{x=1}^N \alpha_x \ket{x}$ that, for all $O_E$, uses on average $o(\sqrt{N})$ queries to $O_E$.
 \end{enumerate}
 \end{theorem}
 \begin{proof}
-Seeking a contradiction, assume that there exists a quantum algorithm that can perform a Bayesian update with probability $\omega(\sqrt{\sum_x |\alpha_x|^2 P(E|x)})$ for any likelihood function $P(E|x)$.  Next, let us choose the likelihood function to be that used in~\eq{reduceLikelihood} in the reduction proof of~\lem{reduce} and take $\alpha_x =1/\sqrt{N}~\forall~x$.  It is clear from~\lem{rejection} that $\Gamma_E =1$ must be chosen for this problem.  Then by assumption the state $\ket{x_m}$, where $x_m \in X_m$, can be found with probability $\omega(\sqrt{\sum_x |\alpha_x|^2 P(E|x)})= \omega(1/\sqrt{N})$.  Since each application of the algorithm requires $O(1)$ queries, $o(\sqrt{N})$ queries are needed on average to learn $x_m$, which violates lower bounds for the average query complexity for Grover's problem~\cite{BGH+96}.  Therefore such a quantum Bayesian inference algorithm is impossible.
+Seeking a contradiction, assume that there exists a quantum algorithm that can perform a Bayesian update with probability $\omega(\sqrt{\sum_x |\alpha_x|^2 P(E|x)})$ for any likelihood function $P(E|x)$.  Next, let us choose the likelihood function to be that used in~\eq{reduceLikelihood} in the reduction proof of~\lem{reduce} and take $\alpha_x =1/\sqrt{N}~\forall~x$.  It is clear from~\lem{rejection} that $\Gamma_E =1$ must be chosen for this problem.  Then by assumption the state $\ket{x_m}$, where $x_m \in X_m$, can be found with probability $\omega(\sqrt{\sum_x |\alpha_x|^2 P(E|x)})= \omega(1/\sqrt{N})$.  Since each application of the algorithm requires $O(1)$ queries, $o(\sqrt{N})$ queries are needed on average to learn $x_m$, which violates lower bounds for the average query complexity for Grover's problem~\cite{BGH+96}.  Therefore algorithm $G$, which is described in 1, is impossible.
 
 
 Again seeking a contradiction, consider the following likelihood function with outcomes $\{1,0\}$
@@ -265,24 +267,30 @@ P(1|x) = \begin{cases}
 For each $x$, $P(1|x)$ can be computed using a single query to $O$ and vice versa, thus a query to this likelihood function is equivalent to a call to $O$.
 Thus~\eq{Bayes} gives that the posterior probability after measuring $1$ is
 \begin{equation}
-\frac{2P(x_m)}{1 + P(x_m)}=2P(x_m) + O(P(x_m)^2).
+P(x_m|1)=\frac{2P(x_m)}{1 + P(x_m)}=2P(x_m) + O(P(x_m)^2).
 \end{equation}
 Therefore $O(\log(N))$ measurements of $1$ suffice to amplify the probability from $1/N$ to $\Theta(1)$.  
+
+Similarly, $P(x_m|1) \ge P(x_m)$ unless $1+P(x_m) > 2$ or $P(x_m)<0$.  Since $P(x_m)$ is a probability this is impossible.  Therefore the posterior probability is monotonically increasing with the number of successful updates.  Thus if we define $\alpha^{(1)}_x:= \alpha_x$ and $\alpha_x^{(m)}$ to be the components of the quantum state after $m+1$ quantum updates then $\sqrt{|\alpha_x^{(m)}|^2 P(1|x)}$ is a  monotonically increasing function of $m$.
 
 In practice, it would be unlikely that $O(\log(N))$ sequential measurements would all yield $1$ (i.e. give noisy information about the marked state), but the user of a quantum Bayesian updating algorithm can always pretend that this sequence of observations was obtained similar to~\lem{reduce}. 
 Given the observable variables follow this sequence, \lem{rejection} shows that 
 there exists a quantum algorithm that can perform each such update with probability of success
 \begin{equation}
-\Omega\left(\sqrt{\sum_x |\alpha_x|^2 P(1|x)}\right) \in \Omega(1),\label{eq:Pfail}
+\sqrt{\sum_x |\alpha_x|^2 P(1|x)} \in \Omega(1),\label{eq:Pfail}
 \end{equation}
 since $P(1|x) \ge 1/3$ and $\sum_x |\alpha_x|^2 =1$.
+
 If we were not able to correct errors then~\eq{Pfail} shows that the probability of successfully inferring the marked state is $O({\rm poly}(1/N))$ since $O(\log(N))$ updates are needed; however, by assumption each failure can be corrected using $o(\sqrt{N}/\log(N))$ queries.  Therefore by attempting quantum Bayesian updates, correcting any errors that might occur and repeating until success, a successful update can be
 obtained with an average number of queries that is in
 \begin{equation}
-o\left( \frac{\sqrt{N}}{\log(N)\sqrt{\sum_x |\alpha_x|^2 P(Y|x)}}\right)\in o\left(\frac{\sqrt{N}}{\log(N)} \right).
+o\left( \frac{\sqrt{N}}{\log(N)\sqrt{\sum_x |\alpha_x|^2 P(1|x)}}\right)\in o\left(\frac{\sqrt{N}}{\log(N)} \right),
 \end{equation}
-Since $O(\log(N))$ such queries are made in the inference process, the marked state can be inferred within probability $p\in \Theta(1)$ using $o(\sqrt{N})$ queries to the likelihood function.  Since a query
-to the likelihood function is equivalent to a query to Grover's oracle, an inexpensive error correction algorithm is also impossible for algorithms with complexity similar to that of~\lem{rejection}.
+because $\sqrt{|\alpha_x^{(m)}|^2 P(1|x)}\ge \sqrt{|\alpha_x|^2 P(1|x)}$ for any $m\ge 1$.
+Since $O(\log(N))$ successful quantum updates are made in the inference process, the marked state can be inferred within probability $p\in \Theta(1)$ using $o(\sqrt{N})$ queries to the likelihood function.  Since a query
+to the likelihood function is equivalent to a query to Grover's oracle, error correction method $H$ (described in 2) is impossible.
+
+Finally, the impossibility of method $I$ directly follows from~\lem{reduce} and lower bounds on Grover's search.
 \end{proof}
 
 These impossibility results show that the quantum updating procedure of~\cite{LYC14} and~\lem{rejection} cannot be improved  without making assumptions about the underlying prior distributions or likelihood functions.  This inefficiency is perhaps unsurprising as exact Bayesian inference is also classically inefficient.  In particular, an efficient sampling algorithm from a distribution that is a close approximation to the  posterior distribution would imply $\P=\NP$~\cite{dagum1993approximating}.  A quantum algorithm capable of efficient Bayesian inference for general models would similarly imply that $\NP \subseteq \BQP$, which is false under reasonable complexity theoretic conjectures.
@@ -745,9 +753,11 @@ This in turn means that the error in the inference of $\mu$ after $L$ steps is a
 
 
 \section{Conclusion}
-Here we have shown a new approach to quantum Bayesian inference that addresses the problems faced by earlier quantum methods: namely their inefficiency in cases where $P(E) = \langle P(x), P(E|x)\rangle$ is exponentially small.  We have shown that by using an approximate form of inference where we learn a concise model of the posterior distribution, rather than the whole distribution, we can continue to learn in spite of failures in quantum rejection sampling because we always have a known prior distribution to fall back on.  We further show a class of unimodal distributions that are trivial to construct using a quantum computer that can serve as a model for the prior and illustrate how to generalize these approaches to time dependent data.  Finally we show that quantum computers can be used to speed up adaptive experiment design by showing that they can speed up evaluating derivatives of the loss function, allowing for efficient experiment optimization for quantum Hamiltonian learning.
+Our main contribution of this paper can be thought of as an analysis of the ability of small quantum systems' capacity to learn.  In it we have examined a class of quantum learning algorithms that require only logarithmic memory to update a register that stores its beliefs about a latent variable $x$ that it must infer from a set of observable variables $E$ that whose likelihoods are only known through access to a quantum oracle.  We show that such algorithms cannot in general be efficient, but provide a semi--classical algorithm that uses classical memory to circumvent this problem within the context of approximate Bayesian inference.
 
-On a conceptual level, and important remaining question that our work shines light on is the question of what learning means in a quantum setting.  In particular, we are able to prepare a state that is mathematically equivalent to the posterior distribution but because we are constrained to sample from such a distribution we cannot be said to know the posterior distribution.  Classical methods do give an approximation to the posterior distribution that can be introspected without destroying the posterior distribution.  Thus an important question to address is what learning actually means for quantum systems and also whether it makes sense to think about inference in absentia of classical memory.  Answering this question may not only shed light on the structure of quantum machine learning algorithms, but also may lead to a deeper understanding of the nature of inference and measurement.
+Our semi--classical algorithm has a number of performance advantages over classical methods.  It also can leverage quantum superposition to provide quadratic advantages for experiment design and also can be used to track the motion of time--dependent latent variables.  We further demonstrate the need to store the model in classical memory is in principle superflous because a quantum repetition code can be used to robustly encode this information in the quantum state.  This suggests that while small quantum systems may not be able to efficiently learn (especially in an online setting), redundant information can be used to protect the knowledge gained by the quantum system against the potentially destructive impacts of the non--linear transformations required by Bayesian inference.  This supports the conjecture that error correction is intimately linked to  learning.  
+
+While the performance advantages yielded by our algorithm suggest that approximate Bayesian inference may be a compelling application for quantum computation, the conceptual insight that this work provides into the nature of quantum learning is perhaps the most important aspect here.  Perhaps the biggest insight is that careful thought is needed to define what learning means for quantum systems.  Answering this question may not only shed light on the structure of quantum machine learning algorithms, but also may lead to a deeper understanding of the nature of inference and measurement.
 
 %\begin{acknowledgements}
 
