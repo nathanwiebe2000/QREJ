@@ -186,6 +186,7 @@ In order to formalize this notion of quantum Bayesian updating within an oracula
 \item There exists a self-inverse quantum oracle, $O_E$, that computes the likelihood function as a bit string in a quantum register: $O_E\ket{x}\ket{y} = \ket{x}\ket{y\oplus P(E|x)}$.
 \item A constant $\Gamma_E$ is known such that $P(E|x) \le \Gamma_E \le 1$ for all $x$.
 \end{enumerate}
+We will also assume that all the latent and observable variables in the problem are discrete.  In the event that they are not, error bounds for discretization are presented in~\app{discrete}.
 %The use of a value $\Gamma_E<1$ allows the  from pure rejection sampling to importance sampling where the instrumental distribution is the distribution $\openone/\Gamma_E$.  In this vein, $\Gamma_E$ couls also be taken to be a non--trivial function of $x$.  This can reduce the posterior variance in the estimate of the true model parameter but we will not consider this case in detail as it purposefully distorts the posterior distribution.
 
 
@@ -310,6 +311,7 @@ These impossibility results show that the quantum updating procedure of~\cite{LY
 
 Although it may not be surprising that quantum Bayesian updating is not generically efficient, it is perhaps surprising that both it and classical updating fail to be efficient for different reasons.  Classical Bayesian updating fails to be efficient because it needs to store prior and posterior probabilities for an exponentially large number of hypotheses; however, its cost scales linearly with the number of updates used.  In contrast, quantum Bayesian updating scales polynomially with the number of hypotheses considered but scales exponentially with the number of updates.  This begs the question of whether it is possibile to combine the best features of quantum and classical Bayesian updating.  We do so in the subsequent section, wherein we show how a classical model can be stored for the system that can be reverted to in the event that a failure is observed in a quantum Bayesian update.
 
+A final point of interest is that quantum Bayesian updating need not fail as $L\rightarrow \infty$.  In fact, we show in~\app{stab} that if the posterior distribution is sufficiently close to a Kronecker--delta function centered on one of the latent variables, $x$, then quantum updating will tend to cause the posterior distribution to converge to $\ket{x}$ if the distinction between success and failure is ignored and $P(E|x)\ne P(E|y)$ for all $x\ne y$.  This means that it is possible, under some circumstances, quantum updating can converge to a unique value without requiring classical memory or error correction strategies according to this observation and the Bernstein von-Mises theorem.
 
 
 %The above impossibility result shows that correcting a faulty quantum Bayesian
@@ -346,8 +348,8 @@ Although it may not be surprising that quantum Bayesian updating is not generica
 Approximations are therefore often needed to make both classical as well as quantum Bayesian inference tractable.  However, the purpose of these approximations is very different.  Classical methods struggle when dealing with probability distributions in high--dimensional spaces, and sophisticated methods like sequential Monte--Carlo approximations are often employed to reduce the effective dimension~\cite{liu_combined_2001,minka2001expectation,van2000unscented}.  However, the non--linear nature of the update rule and the problem of extracting information from the posterior distribution are not issues in the classical setting.  Our quantum algorithm has the exact opposite strengths and weaknesses: it can easily cope with exponentially large spaces but struggles emulating the non-linear nature of the update rule.
 
 We attack the problem by making our quantum algorithm a little more classical, meaning that through out the learning process we aim to learn an approximate classical model for the posterior alongside the quantum algorithm.  This classical model allowsus to approximately re--prepare the state should an update fail throughout the updating process.  This removes the exponential scaling, but results in an approximate inference.  We refer to this procedure as \emph{quantum resampling} as it is reminiscent of resampling in sequential Monte--Carlo algorithms or other particle filter methods such as ADF~\cite{minka2001expectation}.  In order to prepare the distribution,
-we model the posterior distribution as a Gaussian distribution with mean and covariance equal to that of the true posterior.  This choice is sensible because once the Gaussian distribution is specified, the Grover--Rudolph state preparation method can be used to prepare such states as their cumulative distribution functions can be efficiently computed.
-Alternatively, for one--dimensional problems, such states could be manufactured by approximate cloning.
+we model the posterior distribution as a Gaussian distribution with mean and covariance equal to that of the true posterior.  This choice is sensible because once the Gaussian distribution is specified, the Grover--Rudolph state preparation method~\cite{GR02} can be used to prepare such states as their cumulative distribution functions can be efficiently computed.
+Alternatively such states could also be manufactured by approximate cloning under certain circumstances~\cite{gisin1997optimal}.
 
 We define a semi--classical Bayesian update below 
 \begin{definition}
@@ -693,7 +695,7 @@ We would like to thank J. Combes and J. Yard for valuable feedback and discussio
 
 \appendix
 \section{Asymptotic stability of updating}
-
+\label{app:stab}
 Interestingly, this process of classically learning a model for the posterior need not be repeated forever.  If the true model has sufficient support in the final posterior then classical feedback is irrelevant because the quantum algorithm will converge to the true model as $L\rightarrow \infty$ if $P(E|x) \ne P(E|y)$ for all $x\ne y$, regardless whether success or failure is observed.  This is summarized in the following theorem.
 \begin{theorem}
 There exists $\delta>0$ such that if $|\ket{\psi} - \ket{x}| \le \delta$ then the method of~\lem{rejection} converges to $\ket{x}$ if the failure and success branches are treated equivalently and $P(E|x) \ne P(E|y)$ for all $x\ne y$.
@@ -728,7 +730,7 @@ It is clear that the resultant state can be written in the form is $\ket{x} + c\
 \end{proof}
 
 
-\section{Discretization errors}
+\section{Discretization errors}\label{app:discrete}
 Apart from the quantum resampling step, the only source of error that emerges in our inference algorithm is from the discretization of the problem.  We assume here that the underlying probability distribution $P(x)$ and the likelihood function $P(E|x)$ are differentiable functions of $x$ and assume without loss generality that $x\in [0,1]^D$.  We furthermore assume that the mesh used to approximate the probability distribution is uniform and a gridspacing of $\Delta x$ is used in each direction.  This means that the number of points is 
 \begin{equation}
 N= (\Delta x)^{-D}.
@@ -832,115 +834,115 @@ Proof is an immediate consequence of substituting $\Delta x =1/N^{1/D}$ into~\th
 \end{proof}
 This shows that the number of qubits needed is at most logarithmic in the error.  Furthermore, if $L$ updates are required then the total cost is increased by at most an additive factor of $\log(L)$.  We do not include this in our cost estimates since this error estimate is needlessly pessimistic as Bayesian inference is insensitive to the initial prior according to the Bernstein von-Mises theorem and consequently such errors are unlikely to be additive.
 
-
-\section{Approximating the posterior}
-
-There are many methods for preparing states that represent probability
-distributions using a quantum computer. By the linearity of quantum mechanics,
-any method of doing so which is coherent can then be used to prepare a mixture
-distribution such as is used in the SMC approximation. As a result, each such
-method then corresponds to a quantum resampling procedure.
-
-Perhaps the most straightforward is the method of Grover and Rudolph which
-provides an efficient algorithm for preparing a probability distribution that
-is efficiently integrable.  This work is further elaborated by the result of
-Kitaev and Webb~\cite{KW08} which shows that Gaussian states can be efficiently prepared
-using a quantum computer.  Here we focus on preparing a simpler class of
-functions to use within the resampler that can be easily constructed using
-Fourier transforms.
-
-\begin{lemma}\label{lem:sinc}
-Let $k$ be a non--negative integer then a quantum computer can prepare a quantum state of the form $\sum_{x=0}^{2^n-1} e^{i\phi(x)}\sqrt{P(x)}\ket{x}$ where
-$$
-P(x) = \frac{\sin^2(\pi 2^k x/2^n)}{2^{k+n} \sin^2(\pi x/2^n)},
-$$
-using at most $O(n\log(n/\epsilon))$ one and two--quibit gates taken from the set $\{H,P(\theta),\Lambda (P(\theta))\}$ where $P(\theta):\ket{x}\mapsto e^{2\pi i \theta x} \ket{x}$ for $\theta \in \{y/2^n:y\in \mathbb{Z}_{2^n}\}$ and $\Lambda (P(\theta))$ is its controlled counterpart.
-\end{lemma}
-\begin{proof}
-This probability distribution can be prepared using the following steps.
-\begin{enumerate}
-\item Prepare for integer $k>0$ the state $\ket{\psi}=\frac{1}{\sqrt 2^k}\sum_{j=0}^{2^k-1} \ket{j}$ using $k$ Hadamard gates.
-\item Apply the Pauli operator $Z=P(1/2)$ to the least significant bit in $\ket{\psi}$.
-\item Apply QFT to the result.
-\end{enumerate}
-This produces the required state because applying $Z$ to the least significant qubit in $\ket{\psi}$ gives 
-\begin{equation}
-\frac{1}{\sqrt k}\sum_{j=0}^{k-1} e^{-i \pi j}\ket{j},
-\end{equation}
-using the shift property of DFTs it is clear that this phase shift displaces the Fourier transform to the middle of the spectrum.
-Then using the shift property of the discrete Fourier transforms again along with the formula for the DFT of a window function gives that
-\begin{equation}
-P(x) = \frac{\sin^2(\pi 2^k x/2^n)}{2^{k+n} \sin^2(\pi x/2^n)}.
-\end{equation}
-This formula can also be easily proved using the discrete Fourier transform of the Kronecker--delta function and the linearity of the Fourier transform.
-Since $k\le n$ the cost of the circuit is dominated by that of the Fourier transform, which is $O(n\log(n/\epsilon))$ using this gate set according to~\cite{CW00}.
-\end{proof}
-  Note that there is residual phase present in the quantum state in~\lem{sinc} because the initial window is not centered at $x=0$.  This can be corrected, if necessary, by using an adder or by applying a phase rotation in Fourier space.  Also, the result of~\cite{CW00} shows that the depth of the resulting circuits is actually much smaller: it is $O(\log(n) + \log \log(1/\epsilon))$.
-These gates can be further decomposed into circuits over the Clifford + $T$ gate library by incurring a multiplicative cost that is at most $O(\log(n/\epsilon))$ using~\cite{KMM13} or related methods.
-
-Unlike the method of~\cite{KW08}, the above method is not capable of modeling correlations in many--variable systems.  It instead can be used to  model the posterior distribution as a product of independent distributions.  This tends not to be a major issue though because for most well posed learning problems the posterior distribution tends to a unimodal distribution, but potentially can cause problems in cases where the distribution is bimodal or has non--trivial correlations.  The latter issue can be addressed, in part, by using principal component analysis (PCA) which re-expresses the problem in the eigenbasis of the covariance matrix where no correlations exist.  Since the model dimension is generically low, PCA can be considered to be efficient.  Quantum techniques can also be used to sample efficiently from the principal components of the distribution, under certain circumstances~\cite{LMR14}, although it is uncertain whether this capability will be of general use in Bayesian inference.
-
-A potential flaw of using sinc--based resampling is that it has many nodes
-which will be ascribed zero probability in the initial prior.  If the true
-model happens to reside at, or near, one of these nodes then the updating
-procedure may accidentally omit the true model during a quantum resampling
-step.  
-This can be corrected through many approaches, such as resorting to the
-more expensive Gaussian state preparation methods of~\cite{GR02,KW08}.   
-
-We examine whether this poses an issue for the periodic likelihood 
-\begin{align}
-P(1 | \omega; \omega_-, t) &= \cos^2 ((\omega-\omega_-)  t),\nonumber\\
-P(0 | \omega; \omega_-, t) &= \sin^2 ((\omega-\omega_-)  t),\label{eq:simple-precession}
-\end{align}
-where $\omega_-$ and $t$ are experimental parameters.  We choose $\omega_-$ according to the \emph{particle guess heuristic} of~\cite{wiebe_Hamiltonian_2014}
-, which randomly chooses $\omega_- \sim P(\omega)$ and $t=1/(\omega_- - \omega')$ where $\omega' \sim P(\omega)$.
-\eq{simple-precession}.  Although our algorithm is hard to exactly simulate classically, we show
-that classical Liu-West resampling continues to work using $\sinc^2$ as a
-resampling kernel, such that we can reasonably expect that $\sinc^2$ will be
-effective in the quantum case as well. In particular,
-after 100 Bayes updates with classical SMC and the $\sinc^2$ resampling kernel,
-the error incurred is comparable to that incured by resampling with Gaussian
-kernels.  We therefore do not suspect that sinc--based resampling will typically degrade the performance of the inference algorithm.
-
-\begin{figure}
-    \begin{centering}
-        \includegraphics[width=0.6\columnwidth]{lw-sinc-resampling.pdf}
-    \end{centering}
-    \caption{
-        \label{fig:lw-sinc-resampling}
-        Performance of classical SMC with Gaussian and $\sinc^2$ resampling kernels
-        for the  periodic likelihood \eq{simple-precession} and averaged over
-        1,000 trials.
-    }
-\end{figure}
-
-Although we do not expect the nodes of the $\sinc^2$ function to substantially impede inference, the impact of these nodes can be reduced by using a linear combination of such states.  In particular,  we can prepare linear combinations of step functions as our initial states and Fourier transform the result.
-Linear combinations of states can be prepared using the circuit
-    \[
-      \Qcircuit @R 1em @C 1.5em {
-                        \lstick{\ket{0}} & \gate{V}&\ctrl{1}&\ctrlo{1}&\gate{V^\dagger}&\qw\\
-		   \lstick{\ket{\psi}} & \qw &\gate{U_1}&\gate{U_0}&\qw&\qw
-},
-    \]
-where for some real valued $A\ge 0$~\cite{CW12} we have
-\begin{equation}
-V=\begin{pmatrix} \sqrt{\frac{A}{A+1}} & -\sqrt{\frac{1}{A+1}} \\ \sqrt{\frac{1}{A+1}}& \sqrt{\frac{A}{A+1}} \end{pmatrix}.
-\end{equation}
-This is relevant because if the top-most qubit is measured to be $0$ then the circuit performs
-\begin{equation}
-\ket{\psi} \rightarrow \frac{(AU_1 + U_0)\ket{\psi}}{|(AU_1 + U_0)\ket{\psi}|}.
-\end{equation}
-This allows linear combinations of initial states to be prepared from $\ket{0}$ with probability
-\begin{equation}
-P_{\rm succ} = \left|\frac{(A U_1 + U_0)\ket{0}}{A+1} \right|^2\label{eq:succprob}.
-\end{equation}
-Assuming $U_1 \ket{0} = \frac{1}{\sqrt{2^{k_1}}} \sum_{j=0}^{2^{k_1} -1} \ket{j}$ and $U_2 \ket{0} = \frac{1}{\sqrt{2^{k_2}}} \sum_{j=0}^{2^{k_2} -1} \ket{j}$ for ${k_2} \ge {k_1}$ then it is straight forward to see from~\eq{succprob} we have that a linear combination of two states can be formed with probability
-\begin{equation}
-P_{\rm succ} = \frac{\left(\frac{A}{\sqrt{2^{k_1}}} + \frac{1}{\sqrt{2^{k_2}}}\right)^2k_2 +\left(\frac{A}{\sqrt{2^{k_1}}} \right)^2(2^{k_1}-2^{k_2})}{(A+1)^2}.
-\end{equation}
-Since the probability of successfully combining the two unitaries via measurement and postselection is known, amplitude amplification can be used to make the process deterministic~\cite{BHT+00}.
-The probability of success for the case where a polynomial number of terms are summed can also be computed and is furthermore also efficient.
+%
+%\section{Approximating the posterior}
+%
+%There are many methods for preparing states that represent probability
+%distributions using a quantum computer. By the linearity of quantum mechanics,
+%any method of doing so which is coherent can then be used to prepare a mixture
+%distribution such as is used in the SMC approximation. As a result, each such
+%method then corresponds to a quantum resampling procedure.
+%
+%Perhaps the most straightforward is the method of Grover and Rudolph which
+%provides an efficient algorithm for preparing a probability distribution that
+%is efficiently integrable.  This work is further elaborated by the result of
+%Kitaev and Webb~\cite{KW08} which shows that Gaussian states can be efficiently prepared
+%using a quantum computer.  Here we focus on preparing a simpler class of
+%functions to use within the resampler that can be easily constructed using
+%Fourier transforms.
+%
+%\begin{lemma}\label{lem:sinc}
+%Let $k$ be a non--negative integer then a quantum computer can prepare a quantum state of the form $\sum_{x=0}^{2^n-1} e^{i\phi(x)}\sqrt{P(x)}\ket{x}$ where
+%$$
+%P(x) = \frac{\sin^2(\pi 2^k x/2^n)}{2^{k+n} \sin^2(\pi x/2^n)},
+%$$
+%using at most $O(n\log(n/\epsilon))$ one and two--quibit gates taken from the set $\{H,P(\theta),\Lambda (P(\theta))\}$ where $P(\theta):\ket{x}\mapsto e^{2\pi i \theta x} \ket{x}$ for $\theta \in \{y/2^n:y\in \mathbb{Z}_{2^n}\}$ and $\Lambda (P(\theta))$ is its controlled counterpart.
+%\end{lemma}
+%\begin{proof}
+%This probability distribution can be prepared using the following steps.
+%\begin{enumerate}
+%\item Prepare for integer $k>0$ the state $\ket{\psi}=\frac{1}{\sqrt 2^k}\sum_{j=0}^{2^k-1} \ket{j}$ using $k$ Hadamard gates.
+%\item Apply the Pauli operator $Z=P(1/2)$ to the least significant bit in $\ket{\psi}$.
+%\item Apply QFT to the result.
+%\end{enumerate}
+%This produces the required state because applying $Z$ to the least significant qubit in $\ket{\psi}$ gives 
+%\begin{equation}
+%\frac{1}{\sqrt k}\sum_{j=0}^{k-1} e^{-i \pi j}\ket{j},
+%\end{equation}
+%using the shift property of DFTs it is clear that this phase shift displaces the Fourier transform to the middle of the spectrum.
+%Then using the shift property of the discrete Fourier transforms again along with the formula for the DFT of a window function gives that
+%\begin{equation}
+%P(x) = \frac{\sin^2(\pi 2^k x/2^n)}{2^{k+n} \sin^2(\pi x/2^n)}.
+%\end{equation}
+%This formula can also be easily proved using the discrete Fourier transform of the Kronecker--delta function and the linearity of the Fourier transform.
+%Since $k\le n$ the cost of the circuit is dominated by that of the Fourier transform, which is $O(n\log(n/\epsilon))$ using this gate set according to~\cite{CW00}.
+%\end{proof}
+%  Note that there is residual phase present in the quantum state in~\lem{sinc} because the initial window is not centered at $x=0$.  This can be corrected, if necessary, by using an adder or by applying a phase rotation in Fourier space.  Also, the result of~\cite{CW00} shows that the depth of the resulting circuits is actually much smaller: it is $O(\log(n) + \log \log(1/\epsilon))$.
+%These gates can be further decomposed into circuits over the Clifford + $T$ gate library by incurring a multiplicative cost that is at most $O(\log(n/\epsilon))$ using~\cite{KMM13} or related methods.
+%
+%Unlike the method of~\cite{KW08}, the above method is not capable of modeling correlations in many--variable systems.  It instead can be used to  model the posterior distribution as a product of independent distributions.  This tends not to be a major issue though because for most well posed learning problems the posterior distribution tends to a unimodal distribution, but potentially can cause problems in cases where the distribution is bimodal or has non--trivial correlations.  The latter issue can be addressed, in part, by using principal component analysis (PCA) which re-expresses the problem in the eigenbasis of the covariance matrix where no correlations exist.  Since the model dimension is generically low, PCA can be considered to be efficient.  Quantum techniques can also be used to sample efficiently from the principal components of the distribution, under certain circumstances~\cite{LMR14}, although it is uncertain whether this capability will be of general use in Bayesian inference.
+%
+%A potential flaw of using sinc--based resampling is that it has many nodes
+%which will be ascribed zero probability in the initial prior.  If the true
+%model happens to reside at, or near, one of these nodes then the updating
+%procedure may accidentally omit the true model during a quantum resampling
+%step.  
+%This can be corrected through many approaches, such as resorting to the
+%more expensive Gaussian state preparation methods of~\cite{GR02,KW08}.   
+%
+%We examine whether this poses an issue for the periodic likelihood 
+%\begin{align}
+%P(1 | \omega; \omega_-, t) &= \cos^2 ((\omega-\omega_-)  t),\nonumber\\
+%P(0 | \omega; \omega_-, t) &= \sin^2 ((\omega-\omega_-)  t),\label{eq:simple-precession}
+%\end{align}
+%where $\omega_-$ and $t$ are experimental parameters.  We choose $\omega_-$ according to the \emph{particle guess heuristic} of~\cite{wiebe_Hamiltonian_2014}
+%, which randomly chooses $\omega_- \sim P(\omega)$ and $t=1/(\omega_- - \omega')$ where $\omega' \sim P(\omega)$.
+%\eq{simple-precession}.  Although our algorithm is hard to exactly simulate classically, we show
+%that classical Liu-West resampling continues to work using $\sinc^2$ as a
+%resampling kernel, such that we can reasonably expect that $\sinc^2$ will be
+%effective in the quantum case as well. In particular,
+%after 100 Bayes updates with classical SMC and the $\sinc^2$ resampling kernel,
+%the error incurred is comparable to that incured by resampling with Gaussian
+%kernels.  We therefore do not suspect that sinc--based resampling will typically degrade the performance of the inference algorithm.
+%
+%\begin{figure}
+%    \begin{centering}
+%        \includegraphics[width=0.6\columnwidth]{lw-sinc-resampling.pdf}
+%    \end{centering}
+%    \caption{
+%        \label{fig:lw-sinc-resampling}
+%        Performance of classical SMC with Gaussian and $\sinc^2$ resampling kernels
+%        for the  periodic likelihood \eq{simple-precession} and averaged over
+%        1,000 trials.
+%    }
+%\end{figure}
+%
+%Although we do not expect the nodes of the $\sinc^2$ function to substantially impede inference, the impact of these nodes can be reduced by using a linear combination of such states.  In particular,  we can prepare linear combinations of step functions as our initial states and Fourier transform the result.
+%Linear combinations of states can be prepared using the circuit
+%    \[
+%      \Qcircuit @R 1em @C 1.5em {
+%                        \lstick{\ket{0}} & \gate{V}&\ctrl{1}&\ctrlo{1}&\gate{V^\dagger}&\qw\\
+%		   \lstick{\ket{\psi}} & \qw &\gate{U_1}&\gate{U_0}&\qw&\qw
+%},
+%    \]
+%where for some real valued $A\ge 0$~\cite{CW12} we have
+%\begin{equation}
+%V=\begin{pmatrix} \sqrt{\frac{A}{A+1}} & -\sqrt{\frac{1}{A+1}} \\ \sqrt{\frac{1}{A+1}}& \sqrt{\frac{A}{A+1}} \end{pmatrix}.
+%\end{equation}
+%This is relevant because if the top-most qubit is measured to be $0$ then the circuit performs
+%\begin{equation}
+%\ket{\psi} \rightarrow \frac{(AU_1 + U_0)\ket{\psi}}{|(AU_1 + U_0)\ket{\psi}|}.
+%\end{equation}
+%This allows linear combinations of initial states to be prepared from $\ket{0}$ with probability
+%\begin{equation}
+%P_{\rm succ} = \left|\frac{(A U_1 + U_0)\ket{0}}{A+1} \right|^2\label{eq:succprob}.
+%\end{equation}
+%Assuming $U_1 \ket{0} = \frac{1}{\sqrt{2^{k_1}}} \sum_{j=0}^{2^{k_1} -1} \ket{j}$ and $U_2 \ket{0} = \frac{1}{\sqrt{2^{k_2}}} \sum_{j=0}^{2^{k_2} -1} \ket{j}$ for ${k_2} \ge {k_1}$ then it is straight forward to see from~\eq{succprob} we have that a linear combination of two states can be formed with probability
+%\begin{equation}
+%P_{\rm succ} = \frac{\left(\frac{A}{\sqrt{2^{k_1}}} + \frac{1}{\sqrt{2^{k_2}}}\right)^2k_2 +\left(\frac{A}{\sqrt{2^{k_1}}} \right)^2(2^{k_1}-2^{k_2})}{(A+1)^2}.
+%\end{equation}
+%Since the probability of successfully combining the two unitaries via measurement and postselection is known, amplitude amplification can be used to make the process deterministic~\cite{BHT+00}.
+%The probability of success for the case where a polynomial number of terms are summed can also be computed and is furthermore also efficient.
 
 
 %=====================================================================
@@ -963,7 +965,11 @@ likelihood. The most natural way is by introducing new parameters, called
 be modeled. Estimation and inference then proceed on the hyperparameters,
 rather than on the latent variables directly. For instance, letting $\omega$
 in the periodic likelihood 
-\eq{simple-precession} be drawn from a stationary Gaussian
+\begin{align}
+P(1 | \omega; \omega_-, t) &= \cos^2 ((\omega-\omega_-)  t),\nonumber\\
+P(0 | \omega; \omega_-, t) &= \sin^2 ((\omega-\omega_-)  t),\label{eq:simple-precession}
+\end{align}
+ be drawn from a stationary Gaussian
 process and then marginalizing over the history of that process results in a
 new hyperparameterized likelihood
 \begin{equation}
@@ -1018,7 +1024,7 @@ convolution allows us to filter the prior distribution.
 
 
 \begin{theorem}
-Let  $O_{\hat{Q}}$ be a quantum oracle such that $O_{\hat{Q}}\ket{x} \ket{y} = \ket{x} \ket{y\oplus \sin^{-1}(\hat{Q} (x)/\Gamma_E)}$ where $\hat{Q}:=\mathcal{F}(Q)$ and $\hat{Q}(x)\le \Gamma_E$ and $Q(x) \in \mathbb{C}^{2^n}$.  Then given access to a unitary oracle $O_{\rm in}$ that prepares the state $\sum_x \sqrt{P(x)}\ket{x}$, the state $\sum_x \sqrt{(P\star Q) (x)}\ket{x}$ can be prepared with error $\epsilon$ in the $2$--norm using a number of queries that has an average-case query complexity of $O(\sqrt{\Gamma_E/ \langle \mathcal{F}(P), \mathcal{F}(Q)}\rangle)$ and requires on average $O(n \log(n/\epsilon)\sqrt{\Gamma_E/\langle \mathcal{F}(P), \mathcal{F}(Q)}\rangle)$ one-- and two--qubit gates from the set $\{H,P(\theta),\Lambda (P(\theta))\}$ where $P(\theta):\ket{x}\mapsto e^{2\pi i \theta x} \ket{x}$ for $\theta \in \{y/2^n:y\in \mathbb{Z}_{2^n}\}$ and $\Lambda (P(\theta))$ is its controlled counterpart.
+Let  $O_{\hat{Q}}$ be a quantum oracle such that $O_{\hat{Q}}\ket{x} \ket{y} = \ket{x} \ket{y\oplus \sin^{-1}(\hat{Q} (x)/\Gamma_E)}$ where $\hat{Q}:=\mathcal{F}(Q)$ and $\hat{Q}(x)\le \Gamma_E$ and $Q(x) \in \mathbb{C}^{2^n}$.  Then given access to a unitary oracle $O_{\rm in}$ that prepares the state $\sum_x \sqrt{P(x)}\ket{x}$, the state $\sum_x \sqrt{(P\star Q) (x)}\ket{x}$ can be prepared with error $\epsilon$ in the $2$--norm using a number of queries that has an average-case query complexity of $O(\sqrt{\Gamma_E/ \langle \mathcal{F}(P), \mathcal{F}(Q)}\rangle)$.
 \end{theorem}
 \begin{proof}
 Notice that Bayes updating the quantum SMC state consists of pointwise multiplication. As a result, applying \lem{rejection} in the Fourier domain, we can implement the convolution described above.  Doing so involves the following process
@@ -1031,8 +1037,10 @@ If $1$ is measured then the result will implement the circular convolution $P \s
 
 First, the query complexity of this algorithm is easy to estimate.  The initial state preparation requires a query to $O_{\rm in}$ and the calculation of $\hat{Q}(k)$ requires a query to $P_{\hat{Q}}$.  By using amplitude amplification on the $1$ result, we have that on average $O(\sqrt{\Gamma_E/ \langle \mathcal{F}(P), \mathcal{F}(Q)}\rangle)$ queries are required to prepare the state.
 
-The number of non--query operations is the number of operations needed per attempt at rejection sampling multiplied by the number of attempts made.  Step 1 requires $O(n\log(n/\epsilon))$ gate operations~\cite{CW00} to implement the Fourier transform and its inverse.  Step $2$ only requires query operations.  Step $3$ requires $O(\log(1/\epsilon))$, controlled rotations each of which can be implemented using a constant number of one-- and two--qubit operations to ensure that the rotation on the ancilla qubit is successfully implemented within error $O(\epsilon)$.  It also requires performing the inverse quantum Fourier transform which involves performing $O(n\log(n/\epsilon))$ gates.  Summing these costs gives $O(n\log(n/\epsilon))$.  The quoted scaling of the circuit size then follows by multiplying this by the number of attempts needed to achieve a successful result using amplitude amplification.
+%The number of non--query operations is the number of operations needed per attempt at rejection sampling multiplied by the number of attempts made.  Step 1 requires $O(n\log(n/\epsilon))$ gate operations~\cite{CW00} to implement the Fourier transform and its inverse.  Step $2$ only requires query operations.  Step $3$ requires $O(\log(1/\epsilon))$, controlled rotations each of which can be implemented using a constant number of one-- and two--qubit operations to ensure that the rotation on the ancilla qubit is successfully implemented within error $O(\epsilon)$.  It also requires performing the inverse quantum Fourier transform which involves performing $O(n\log(n/\epsilon))$ gates.  Summing these costs gives $O(n\log(n/\epsilon))$.  The quoted scaling of the circuit size then follows by multiplying this by the number of attempts needed to achieve a successful result using amplitude amplification.
 \end{proof}
+
+Thus provided the overlap between the two fourier transforms is large, the probability of successfully broadening the prior by convolving it with $Q$ will be large and thus not impose a substantial multiplicative cost on the algorithm.  This shows that it is possible to track time-dependent drift in the latent variables without having to resort to broadening the model of the posterior that is formed during a resampling step.
 %=====================================================================
 \bibliographystyle{apsrev}
 \bibliography{qsmc2}
