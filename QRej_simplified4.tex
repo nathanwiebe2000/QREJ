@@ -115,7 +115,8 @@ Proof of~#1.}}
 %\newcommand{\id}{\mathbb{I}}
 
 
-\title{Efficient Online Quantum Bayesian Inference}
+%\title{Efficient Online Quantum Bayesian Inference}
+\title{Can small quantum systems learn?}
 \author{Nathan Wiebe$^\dagger$}
 \author{Christopher Granade$^{*+}$}
 \affiliation{$^\dagger$Quantum Architectures and Computation Group, Microsoft Research, Redmond, WA (USA)}
@@ -130,24 +131,31 @@ Proof of~#1.}}
     Sydney, NSW, Australia
 }
 \begin{abstract}
-We present a new quantum algorithm for approximate Bayesian inference that can efficiently estimate the low order moments of the posterior distribution in an online setting modulo reasonable assumptions on the likelihood function.  Our method does so by using a non-deterministic quantum algorithm to infer a simple model for the posterior distribution, which allows it to efficiently learn in an online fashion without measurement errors causing the posterior distribution to be lost.  We further show that the success probability of our algorithm is optimal in the sense that an asymptotic improvement to the algorithm's success probability would violate lower bounds for unstructured search and also provide quantum methods for adaptive experiment design and learning in the presence of stochastically varying latent variables.
+%We present a new quantum algorithm for approximate Bayesian inference that can efficiently estimate the low order moments of the posterior distribution in an online setting modulo reasonable assumptions on the likelihood function.  Our method does so by using a non-deterministic quantum algorithm to infer a simple model for the posterior distribution, which allows it to efficiently learn in an online fashion without measurement errors causing the posterior distribution to be lost.  We further show that the success probability of our algorithm is optimal in the sense that an asymptotic improvement to the algorithm's success probability would violate lower bounds for unstructured search and also provide quantum methods for adaptive experiment design and learning in the presence of stochastically varying latent variables.
+We examine the question of whether quantum mechanics places limitations on the ability of small quantum devices learning.  We specifically examine the question in the context of Bayesian inference wherein the prior and posterior distributions are encoded in the quantum state vector.  We conclude based on lower bounds from Grover's search that an efficient blackbox method for updating the distribution is impossible.  We then address this by providing a new form of approximate quantum Bayesian inference can remain tractable if the quantum system is augmented with classical memory or if the low--order moments of the distribution are protected using a repetition code.  This work suggests that there may be a connection between fault tolerance and the capacity of a quantum system to learn from its surroundings.
 \end{abstract}
 \maketitle
 \section{Introduction}
-Data processing has emerged within the last few years to be a problem of central importance within both academic circles and industry.  The need for ever more sophisticated methods for processing data arose from the fact that modern experiments produce huge amounts of data and properly inferring information from huge data sets can require substantial computational power.  A natural question to ask is whether quantum technologies can help quell the insatiable demand on computational time that statistical inference creates.  We present here evidence that quantum computing can be used to speed up statistical inference relative to classical methods and show that limits exist on the extent to which such methods can be accelerated.  
 
-In particular, we focus on accelerating Bayesian inference.  Bayes' rule is the heart of Bayesian inference, which gives the correct way to update a prior distribution that describes the users' initial beliefs about a system model when a piece of experimental evidence is received.  If $E$ be a piece of evidence (an observable variable) and $x$ denotes a candidate model for the experimental system (a latent or hidden variable) then Bayes' rule states that the probability that the model is valid given the evidence (denoted $P(x|E)$) is 
+
+%Data processing has emerged within the last few years to be a problem of central importance within both academic circles and industry.  The need for ever more sophisticated methods for processing data arose from the fact that modern experiments produce huge amounts of data and properly inferring information from huge data sets can require substantial computational power.  A natural question to ask is whether quantum technologies can help quell the insatiable demand on computational time that statistical inference creates.  We present here evidence that quantum computing can be used to speed up statistical inference relative to classical methods and show that limits exist on the extent to which such methods can be accelerated.  
+
+Quantum systems have an incredible capacity to store vectors.  Only $n$ qubits suffice to represent a vector in $\mathbb{R}^{2^n}$.  This, in part, is the origin of all of the celebrated exponential speedups that quantum computing offers~\cite{shor1994algorithms,lloyd1996universal,childs2003exponential,harrow2009quantum}.  This ability of a small quantum register to store a very high--dimensional vector raises a similar question: can a quantum agent with a logarithmically sized quantum memory efficiently learn from its surroundings?
+Here we seek to shed light on this question by investigating Bayesian inference as a way to model the quantum agent inferring properties about its surroundings.  We will see that lower bounds on quantum query complexity of unstructured search place severe limitations on the ability of the system to learn exactly.  Nonetheless, we will also see that quantum mechanics opens a new realm of possibilities for approximate learning that are not present in classical Bayesian inference.
+
+%In particular, we focus on accelerating Bayesian inference.  
+Bayes' rule is the heart of Bayesian inference.  It gives the correct way to update a prior distribution that describes the users' initial beliefs about a system model when a piece of experimental evidence is received.  If $E$ be a piece of evidence (an observable variable) and $x$ denotes a candidate model for the experimental system (a latent or hidden variable) then Bayes' rule states that the probability that the model is valid given the evidence (denoted $P(x|E)$) is 
 \begin{equation}
-P(x|E)= \frac{P(E|x) P(x)}{\int_x P(E|x) P(x)\mathrm{d}x}= \frac{P(E|x) P(x)}{\langle P(E|x), P(x) \rangle},\label{eq:Bayes}
+P(x|E)= \frac{P(E|x) P(x)}{P(E)}= \frac{P(E|x) P(x)}{\langle P(E|x), P(x) \rangle},\label{eq:Bayes}
 \end{equation}
 where $P(E|x)$ is known as the likelihood function and is assumed to either be either numerically or inferred emperically.
 This form of learning has a number of advantages for applications in quantum information processing.  Firstly, it is highly robust to noise and experimental imperfections.  Secondly, it is broadly applicable to almost every data processing problem.  Finally, Bayesian inference provides a probability distribution rather than a point estimate of the model. This allows the uncertainty in the inferred parameter to be directly computed.
 
 
 
-There are several features that can make Bayesian inference computationally expensive, especially for scientific applications.  Perhaps the biggest contributor to the cost of these algorithms is the dimensionality of the model space.  Typically the model $x$ is parameterized by a vector in $\mathbb{R}^d$, which means that precisely performing an update requires integrating over an infinite number of hypotheses.  Such integrals are often intractable, which limits the applicability of exact Bayesian inference.  %Another important issue is that the likelihood function is also often intractable in absentia of quantum computing.  These features make exact Bayesian inference challenging.
+There are several features that can make Bayesian inference computationally expensive, especially for scientific applications.  Perhaps the biggest contributor to the cost of these algorithms is the dimensionality of the model space.  Typically the latent variable $x$ is parameterized by a vector in $\mathbb{R}^d$, which means that precisely performing an update requires integrating over an infinite number of hypotheses.  Such integrals are often intractable, which limits the applicability of exact Bayesian inference.  %Another important issue is that the likelihood function is also often intractable in absentia of quantum computing.  These features make exact Bayesian inference challenging.
 
-A natural question to ask at this point is whether quantum computing could make inference tractable.  This issue is has been recently discussed in~\cite{LYC14}, which uses ideas from quantum rejection sampling~\cite{HHL09,ORR13} to accelerate the inference process.  Their work leaves a number of important issues open.  The method has success probability that shrinks exponentially with the number of updates attempted.  Furthermore, the algorithm cannot be applied in an online fashion nor can it be applied to continuous problems or those with stochastically varying latent variables.  We address these issues here by providing a quantum algorithm that can implement Bayesian inference in an online fashion by periodically classically caching a model of the posterior distribution.  This approach to learning not only generalizes the prior Bayesian inference work, but also generalizes Grover's search to scenarios where queries do not provide definitive evidence about the marked state.  We provide a complete description of this in the following.
+A natural question to ask at this point is whether quantum computing could make inference tractable.  This issue is has been recently discussed in~\cite{LYC14}, which uses ideas from quantum rejection sampling~\cite{HHL09,ORR13} to accelerate the inference process.  Their work leaves a number of important issues open.  The method has success probability that shrinks exponentially with the number of updates attempted.  Furthermore, the algorithm cannot be applied in an online fashion nor can it be applied to continuous problems or those with stochastically varying latent variables.  We address these issues here by providing a quantum algorithm that can implement Bayesian inference in an online fashion by periodically classically caching a model of the posterior distribution.  This approach allows the quantum agent to revert to a previous model in the event that the update process fails, which allows the process to be implemented efficiently under reasonable assumptions on the likelihood function.
 
 
 %\begin{equation}
@@ -377,20 +385,20 @@ In particular, using $\lambda_x = x$ in~\lem{ampest} yields the mean $x_0$.  The
 
 
 \begin{corollary}
-Assume that the components of the mean of the prior distribution over model vectors are $\{\lambda_{0,j}:j=1\ldots D\}$ and $\Delta \lambda \ge \max_j |\langle \Lambda_j \rangle-\lambda_{0,j}|$.  The mean and covariance matrix can be computed within error $\epsilon$ using $\tilde{O}\left(\frac{D^2\Delta \lambda \Gamma_E}{\epsilon \langle P(x), P(E|x)\rangle}\right)$ queries to $O_E$.\label{cor:method}
+Assume that the components of the mean of the prior distribution over model vectors are $\{\lambda_{0,j}:j=1\ldots D(D+1)\}$ and $\Delta \lambda \ge \max_j |\langle \Lambda_j \rangle-\lambda_{0,j}|$ where $\Lambda_j$ is the operator corresponding to $x$ or $x^2$  depending on the index $j$.  The mean and covariance matrix can be computed within error $\epsilon$ using $\tilde{O}\left(\frac{D^2\Delta \lambda \Gamma_E}{\epsilon \langle P(x), P(E|x)\rangle}\right)$ queries to $O_E$.\label{cor:method}
 \end{corollary}
 \begin{proof}
 In order to apply the reasoning of~\lem{ampest} to estimate the posterior mean and variance, we need to prepare the following state conditioned on evidence $E$
 \begin{equation}
-\sum_{x} \sqrt{\frac{P(x|E)}{2}} \ket{x}\ket{\lambda_x}\left(\sqrt{1+\frac{\lambda_x-\lambda_0 }{\Delta \lambda}}\ket{1} + \sqrt{1-\frac{\lambda_x-\lambda_0 }{\Delta \lambda}}\ket{0} \right),\label{eq:hadtest2}
+\sum_{x} \sqrt{\frac{P(x|E)}{2}} \ket{x}\ket{\lambda_x}\left(\sqrt{1+\frac{\lambda_x-\lambda_{0,x} }{\Delta \lambda}}\ket{1} + \sqrt{1-\frac{\lambda_x-\lambda_{0,x} }{\Delta \lambda}}\ket{0} \right),\label{eq:hadtest2}
 \end{equation}
 where $\lambda_x =x$ or $\lambda_x =x^2$.
 
-Let $P(1)= \sum_x P(x) P(E|x)/\Gamma_E$ be the probability of performing the Bayesian update.  Let $P(11)$ be the probability of both performing the update and measuring the right most qubit in~\eq{hadtest} to be $1$.  This probability is
+Let $P(1)= \sum_x P(x) P(E|x)/\Gamma_E$ be the probability of performing the quantum Bayesian update.  Let $P(11)$ be the probability of both performing the update and measuring the right most qubit in~\eq{hadtest} to be $1$.  This probability is
 \begin{equation}
 P(11) = \frac{P(1)}{2}\left(1+\frac{\langle \Lambda_k \rangle -\lambda_{0,k}}{\Delta \lambda} \right),
 \end{equation}
-where $\Lambda_k$ is an observable that reports either the $k^{\rm th}$ mean or the $k^{\rm th}$ element of the covariance matrix and $\langle \cdot \rangle$ refers to the expectation of a quantity in the posterior state.
+where $\Lambda_k$ is either of the form $x_i$ or $x_ix_j$ depending on the index $k$ and $\langle \cdot \rangle$ refers to the expectation of a quantity in the posterior state.
 Therefore $\langle \Lambda_k \rangle$ can be computed from $P(11)$ and $P(1)$ via
 \begin{equation}
 \langle \Lambda_k \rangle = \left(2\frac{P(11)}{P(1)}-1 \right)\Delta \lambda + \lambda_{0,k},
@@ -408,7 +416,7 @@ Below we combine these ideas to construct an online quantum algorithm that is ca
 \begin{theorem}
 Let $F(x;\mu, \Sigma)$ be a family of approximations to the posterior distribution parameterized by the posterior mean $\mu$ and the posterior covariance matrix $\Sigma$ and $\{E_k: k=1,\ldots L\}$ be a set of $L$ observable variables.  Then a semi--classical update of a quantum state $\sum_x \sqrt{P(x)} \ket{x}$ can be performed using a number of queries to $O_E$ that is in
 $$
-\tilde{O} \left(\frac{LD^2 \Delta \lambda }{\epsilon \langle  P(x), \prod_{k=1}^LP(E_k|x)/\Gamma_{E_k}\rangle} \right).
+\tilde{O} \left(\frac{LD^2 \Delta  \lambda\Gamma_{E_k}}{\epsilon \langle  P(x), \prod_{k=1}^LP(E_k|x)\rangle} \right).
 $$
 \end{theorem}
 \begin{proof}
@@ -419,21 +427,24 @@ The algorithm is simple.
 \item Return these quantities, which give a parameterization of the approximation to the posterior distribution.
 \end{enumerate}
 
-After step 1, we have from the independence of the successes that the probability of all $L$ updates succeeding is $\sum_x P(x) \prod_{k=1}^L P(E_k|x)/\Gamma_{E_k}$.  Thus step 2 can be performed using $\tilde{O}\left(\frac{D^2\Delta \lambda }{\epsilon \langle w, \prod_k P(E_k|x)/\Gamma_{E_k}\rangle}\right)$ preparations of the posterior state from~\cor{method}.  Since each such preparation requires $L$ queries to $O_E$ the total query complexity required to learn the posterior mean and variance is
+After step 1, we have from the independence of the successes that the probability of all $L$ updates succeeding is $\sum_x P(x) \prod_{k=1}^L P(E_k|x)/\Gamma_{E_k}$.  Thus step 2 can be performed using $\tilde{O}\left(\frac{D^2\Delta \lambda \Gamma_{E_k}}{\epsilon \langle w, \prod_k P(E_k|x)\rangle}\right)$ preparations of the posterior state from~\cor{method}.  Since each such preparation requires $L$ queries to $O_E$ the total query complexity required to learn the posterior mean and variance is
 \begin{equation}
-\tilde{O} \left(\frac{LD^2 \Delta \lambda }{\epsilon \langle  P(x), \prod_{k=1}^LP(E_k|x)/\Gamma_{E_k}\rangle} \right)
+\tilde{O} \left(\frac{LD^2 \Delta \lambda\Gamma_{E_k} }{\epsilon \langle  P(x), \prod_{k=1}^LP(E_k|x)\rangle} \right)
 \end{equation}
 
 Finally, since the algorithm outputs the mean and covariance matrix of the posterior distribution, it outputs a function $F(x;\mu,\sigma)$ that captures (to within error $\epsilon$) the first two moments of the posterior distribution.  Thus the algorithm clearly performs a semi--classical update as per~\defn{semi}.
 \end{proof}
 
-Sequential Monte--Carlo (SMC) methods are perhaps the most natural family of classical algorithms to compare this algorithm to.  Such algorithms approximate the posterior distribution using a weighted sum of delta--functions, which can also be thought of as a parameterized family of distributions within our framework.   We see that if we are given a likelihood function as a classical oracle then the number of queries needed is
-\begin{equation}
-\tilde{O}(N_{\rm part} L),
-\end{equation}
-where $N_{\rm part}$ is the number of particles in the SMC cloud approximating the prior distribution.  It is known that $N_{\rm part}$ scales sub--exponentially with $D$, however in practice  tens of thousands of particles are often needed for simple problems.  In the quantum case, only one particle is needed so this often will constitute a significant speed advantage over SMC if the remaining terms are $\max_k \frac{\Gamma_{E_k} \Delta \lambda}{\epsilon \sum_x P(x) P(E_k|x)}\in O(1)$, which we expect for many realistic problems.  Also, the quantum algorithm yields the expectation value over the true posterior distribution without resorting to the approximate posteriors yielded by SMC methods.
+The complexity of the above approximate quantum inference algorithm cannot be easily compared to that of exact Bayesian inference because both algorithms
+provide very different pieces of information.  Until very recently,
+no natural analogue of our quantum method could easily be found in the literature.  The result of~\cite{wiebe2015bayesian} provides such a classical analogue.  The classical query complexity of their algorithm is quadratically worse in its scaling with $\epsilon$.
 
-As a final note, since amplitude estimation is used liberally in these protocols it is important to reduce the cost of this algorithm as much as possible.  Although amplitude estimation is near-optimal it does not by default use prior information that can be used to accelerate the learning process.  Below we formally prove a theorem, which is proposed informally in~\cite{WHW15}.
+%Sequential Monte--Carlo (SMC) methods are perhaps the most natural family of classical algorithms to compare this algorithm to.  Such algorithms approximate the posterior distribution using a weighted sum of delta--functions, which can also be thought of as a parameterized family of distributions within our framework.   We see that if we are given a likelihood function as a classical oracle then the number of queries needed is
+%\begin{equation}
+%\tilde{O}(N_{\rm part} L),
+%\end{equation}
+%where $N_{\rm part}$ is the number of particles in the SMC cloud approximating the prior distribution.  It is known that $N_{\rm part}$ scales sub--exponentially with $D$, however in practice  tens of thousands of particles are often needed for simple problems.  In the quantum case, only one particle is needed so this often will constitute a significant speed advantage over SMC if the remaining terms are $\max_k \frac{\Gamma_{E_k} \Delta \lambda}{\epsilon \sum_x P(x) P(E_k|x)}\in O(1)$, which we expect for many realistic problems.  Also, the quantum algorithm yields the expectation value over the true posterior distribution without resorting to the approximate posteriors yielded by SMC methods.
+Although we obtain a quadratic advantage in the scaling with $\epsilon$, it would be nice to obtain further algorithmic advantages using amplitude amplification.  Further advantages can be obtained in cases where the probabilities $P(11)$ and $P(1)$ are small by using amplitude amplification to boost these probabilities and then work backwards to infer the non--boosted probabilities.  Below we formally prove a theorem to this effect that formalizes a similar claim made informally in~\cite{WHW15}.
 
 \begin{theorem}
 Let $U$ be a unitary operator such that $U\ket{0}=\sqrt{a}\ket{\phi} + \sqrt{1-a}\ket{\phi^\perp}$ where $\braket{\phi}{\phi^\perp}=0$ for $0<a\le a_0<1$, $1-a_0\in \Theta(1)$ and let $S$ be a projector such that $S\ket{\phi}=-\ket{\phi}$ and $S\ket{\phi^\perp}=\ket{\phi^\perp}$.  Then $a$ can be estimated to within error $\epsilon$ using $\tilde{O}(\sqrt{a_0}/\epsilon)$ applications of $S$ with high probability.\label{thm:priorAmpEst}
@@ -467,96 +478,6 @@ m > \frac{1}{2}\left(\frac{\pi}{2\sin^{-1}(\sqrt{a})}-1\right)\label{eq:mvalid}
 as claimed.
 \end{proof}
 
-%=====================================================================
-\section{Filtering Distributions for Time-Dependent Models}
-\label{sec:time-dep}
-%=====================================================================
-
-In practice a physical system whose properties we want to infer is seldom time
-independent. Moreover, by demanding time-invariance, we preclude applications
-to many interesting problem domains outside of physics, such as in financial
-modeling and computer vision. In such cases, the likelihood function $P(E|x)$
-is replaced by $P(E|x;\tau)$ where $\tau$ is the time in the experimental
-system. Thus, the techniques developed do not directly apply to time-dependent
-cases, but rather to the model that results from marginalizing over this time-
-dependence.
-
-There are several ways of dealing with problems involving a time-dependent
-likelihood. The most natural way is by introducing new parameters, called
-\emph{hyperparameters}, that allow the variation of the likelihood function to
-be modeled. Estimation and inference then proceed on the hyperparameters,
-rather than on the latent variables directly. For instance, letting $\omega$
-in the periodic likelihood 
-\eq{simple-precession} be drawn from a stationary Gaussian
-process and then marginalizing over the history of that process results in a
-new hyperparameterized likelihood
-\begin{equation}
-    P(1 | \mu, \sigma; \omega_-, t) = \frac{1}{2} \left(e^{-\frac{1}{2} \sigma ^2 t^2} \cos (\mu  t)+1\right),
-\end{equation}
-where $\mu$ and $\sigma^2$ are the mean and variance of the Gaussian process.
-Using hyperparameters works well for modeling the distribution of the
-dynamics of a model and can be directly implemented using the previously
-discussed methods, but it does little to help track the \emph{instantaneous}
-latent variables of the system.
-
-
-Tracking such variation in the latent variables can be 
-challenging because as Bayesian inference proceeds the certainty in the
-value of the latent variables tends to increase, but if these variables drift beyond the support of the posterior distribution
-then Bayesian inference will never be able to recover. 
-In other words, if the true model for a system drifts into a region that the is not supported by the a prior obtained by previous updates that neglected
-the stochasticity of the latent variables then the algorithm will no longer be able to track the instantaneous value of the latent variable.
-
-%In a similar way, CRej can be extended to include diffusion by using a resampling kernel
-%that has a broader variance than that of the accepted posterior samples. Doing so
-%allows CRej to track stochastic processes in a similar way to sequential Monte--Carlo methods.%, as is illustrated
-%in \fig{crej-diffusion}. %Our proposal thus extends this application to include significantly
-%more challenging likelihood functions.
-
-Fortunately, the SMC literature has already provided a solution to this problem.  Approximate inference algorithms can
-be made to track stochastically varying latent variables, by incorporating a prediction step that diffuses the hidden variables
-of each particle \cite{isard_condensationconditional_1998}. Here, we extend this technique to the our
-quantum algorithm by performing Bayes updates on QFT-transformed posterior
-states. This allows our algorithm to continue enjoying dramatic advantages
-in space complexity even in the presence of time-dependence.
-
-
-In particular, by convolving the prior with a filter function such as a
-Gaussian, the width of the resultant distribution can be increased without
-affecting the prior mean.  This means that the Bayes estimate of the true
-model will remain identical while granting the prior the ability to recover
-from time-variation of the latent variables.  In particular, if we assume
-that at each step Bayesian inference causes the posterior variance to contract
-by a factor of $\alpha$ and  convolution with a filter function causes the
-variance to expand by $\beta$ then the viariance of the resulting distribution
-asymptotes to $\beta/(1-\alpha)$. Thus we can combat $\sigma(x)$ from becoming
-unrealistically small by applying such filtering strategies.
-
-The convolution property of the Fourier transform gives for any two functions $P$ and $Q$
-\begin{equation}
-P \star Q \propto \mathcal{F}^{-1}\left(\mathcal{F}(P) \cdot \mathcal{F}(Q) \right),\label{eq:conv}
-\end{equation}
-where $\star$ is the circular convolution operation.
-The quantum Fourier transform can therefore be used to convolve an unknown $P$ with a known distribution $Q$ that has an efficiently computable Fourier transform $\hat{Q}$.  This
-convolution allows us to filter the prior distribution.
-
-
-\begin{theorem}
-Let  $O_{\hat{Q}}$ be a quantum oracle such that $O_{\hat{Q}}\ket{x} \ket{y} = \ket{x} \ket{y\oplus \sin^{-1}(\hat{Q} (x)/\Gamma_E)}$ where $\hat{Q}:=\mathcal{F}(Q)$ and $\hat{Q}(x)\le \Gamma_E$ and $Q(x) \in \mathbb{C}^{2^n}$.  Then given access to a unitary oracle $O_{\rm in}$ that prepares the state $\sum_x \sqrt{P(x)}\ket{x}$, the state $\sum_x \sqrt{(P\star Q) (x)}\ket{x}$ can be prepared with error $\epsilon$ in the $2$--norm using a number of queries that has an average-case query complexity of $O(\sqrt{\Gamma_E/ \langle \mathcal{F}(P), \mathcal{F}(Q)}\rangle)$ and requires on average $O(n \log(n/\epsilon)\sqrt{\Gamma_E/\langle \mathcal{F}(P), \mathcal{F}(Q)}\rangle)$ one-- and two--qubit gates from the set $\{H,P(\theta),\Lambda (P(\theta))\}$ where $P(\theta):\ket{x}\mapsto e^{2\pi i \theta x} \ket{x}$ for $\theta \in \{y/2^n:y\in \mathbb{Z}_{2^n}\}$ and $\Lambda (P(\theta))$ is its controlled counterpart.
-\end{theorem}
-\begin{proof}
-Notice that Bayes updating the quantum SMC state consists of pointwise multiplication. As a result, applying \lem{rejection} in the Fourier domain, we can implement the convolution described above.  Doing so involves the following process
-\begin{enumerate}
-\item  Fourier transform the current posterior, $\ket{P}:=\sum_x P(x) \ket{x} \mapsto \hat{\mathcal{F}}\left(\sum_x P(x) \ket{x} \right):= \sum_k \omega_k \ket{k}$.
-\item Prepare the Fourier-domain representation of the convolution kernel, \\$\sum_k \omega_k \ket{k}\mapsto \sum_k \omega_k \ket{k}\ket{\sin^{-1}(\sqrt{\hat{Q}(k)/\Gamma_E})}$.
-\item Update by the convolution kernel and transform back, \\$\sum_k \omega_k \ket{k}\ket{\sin^{-1}(\sqrt{\hat{Q}(k)/\Gamma_E})}\mapsto \hat{\mathcal{F}}^{-1}\left(\sum_k \omega_k \ket{k}\ket{0}\left(\sqrt{\hat{Q}(k)/\Gamma_E}\ket{1}+\sqrt{1-\hat{Q}(k)/\Gamma_E}\ket{0} \right)\right)$.
-\end{enumerate}
-If $1$ is measured then the result will implement the circular convolution $P \star Q$ according to~\eq{conv} and Plancherel's theorem.
-
-First, the query complexity of this algorithm is easy to estimate.  The initial state preparation requires a query to $O_{\rm in}$ and the calculation of $\hat{Q}(k)$ requires a query to $P_{\hat{Q}}$.  By using amplitude amplification on the $1$ result, we have that on average $O(\sqrt{\Gamma_E/ \langle \mathcal{F}(P), \mathcal{F}(Q)}\rangle)$ queries are required to prepare the state.
-
-The number of non--query operations is the number of operations needed per attempt at rejection sampling multiplied by the number of attempts made.  Step 1 requires $O(n\log(n/\epsilon))$ gate operations~\cite{CW00} to implement the Fourier transform and its inverse.  Step $2$ only requires query operations.  Step $3$ requires $O(\log(1/\epsilon))$, controlled rotations each of which can be implemented using a constant number of one-- and two--qubit operations to ensure that the rotation on the ancilla qubit is successfully implemented within error $O(\epsilon)$.  It also requires performing the inverse quantum Fourier transform which involves performing $O(n\log(n/\epsilon))$ gates.  Summing these costs gives $O(n\log(n/\epsilon))$.  The quoted scaling of the circuit size then follows by multiplying this by the number of attempts needed to achieve a successful result using amplitude amplification.
-\end{proof}
 
 
 
@@ -710,7 +631,7 @@ O\left({\epsilon_0^{2/3}}{\max_{c,j}\left|\frac{\partial^3 U(c)}{\partial c_j^3}
 If we wish to make this error $\epsilon$ then it suffices to take $\epsilon_0 = \epsilon^{3/2}/\sqrt{\max_{c,j}\left|\frac{\partial^3 U(c)}{\partial c_j^3} \right|}$.  Since the cost of computing $U(c\pm \delta_j)$ within error $\epsilon_0$ with high probability is $\tilde O(D/\epsilon_0)$ the cost estimates follow.
 \end{proof}
 
-This shows that we can use quantum techniques to achieve a polynomial speedup over classical methods for computing the gradient using sampling, which would require $O(D/\epsilon_0^2)$ queries.  
+This shows that we can use quantum techniques to achieve a polynomial speedup over classical methods for computing the gradient using sampling, which would require $O(D/\epsilon_0^2)$ queries.  It is also worth noting that high--order methods for estimating the gradient may be useful for further improving the error scaling.
 
 Another interesting feature of this approach is that we do not explicitly use the qubit string representation for the likelihood to prepare states such as~\eq{update1}.   Similar states could therefore also be prepared for problems such as quantum Hamiltonian learning~\cite{WGF+14} by eschewing a digital oracle and instead using a quantum simulation circuit that marks parts of the quantum state that correspond to measurement outcome $d$ being observed.  This means that these algorithms can be used in concert with quantum Hamiltonian learning ideas to efficiently optimize experimental design, whereas no efficient classical method exists to do so because of the expense of simulation.
 
@@ -724,7 +645,7 @@ The repetition code that allows us to reach the classical limit of the quantum a
 \begin{equation}
 \sum_{j} \sqrt{P(x_j)} \ket{x_j} \mapsto \ket{\psi}:= \left(\sum_j \sqrt{P(x_j)} \ket{x_j}\right)^{\otimes K}.
 \end{equation}
-In order to learn the mean from such a state without destroying it, we need to add an additional register that stores an estimate of the mean-value to a fixed number of bits of precision.  This can be achieved using the method of (CITE GROVER).  We denote this state as
+In order to learn the mean from such a state without destroying it, we need to add an additional register that stores an estimate of the mean-value to a fixed number of bits of precision.  This can be achieved using the method of~\cite{GR02}.  We denote this state as
 \begin{equation}
 \sum_{x_1,\ldots,x_K} \sqrt{P(x_1)\cdots P(x_K)} \ket{x_1\ldots x_K} \ket{\bar{x}(x_1\ldots x_K)},
 \end{equation}
@@ -757,12 +678,11 @@ Our main contribution of this paper can be thought of as an analysis of the abil
 
 Our semi--classical algorithm has a number of performance advantages over classical methods.  It also can leverage quantum superposition to provide quadratic advantages for experiment design and also can be used to track the motion of time--dependent latent variables.  We further demonstrate the need to store the model in classical memory is in principle superflous because a quantum repetition code can be used to robustly encode this information in the quantum state.  This suggests that while small quantum systems may not be able to efficiently learn (especially in an online setting), redundant information can be used to protect the knowledge gained by the quantum system against the potentially destructive impacts of the non--linear transformations required by Bayesian inference.  This supports the conjecture that error correction is intimately linked to  learning.  
 
-While the performance advantages yielded by our algorithm suggest that approximate Bayesian inference may be a compelling application for quantum computation, the conceptual insight that this work provides into the nature of quantum learning is perhaps the most important aspect here.  Perhaps the biggest insight is that careful thought is needed to define what learning means for quantum systems.  Answering this question may not only shed light on the structure of quantum machine learning algorithms, but also may lead to a deeper understanding of the nature of inference and measurement.
-
+Although our work suggests that small quantum systems may face substantial difficulties when trying to perform Bayesian inference in an oracular setting, much more work is needed in order to provide a complete answer to the question.  In particular, a firm definition is needed in order to address the question of what learning even means for quantum systems outside of the confines of the definition we implicitly assume through our consideration of Bayesian updating.  A suitable answer to this question may not only shed light on the nature of learning in physical systems but also help us come to grips with the limitations that arises from trying to reason using agents whose ephemeral memories are kept in quantum states of matter.
 %\begin{acknowledgements}
 
 \begin{acknowledgements}
-We would like to thank J. Combes for valuable feedback and discussion.
+We would like to thank J. Combes and J. Yard for valuable feedback and discussion as well as J. Emerson for suggesting the idea of quantum learning agents.
 \end{acknowledgements}
 %% APPENDIX %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1018,6 +938,96 @@ Since the probability of successfully combining the two unitaries via measuremen
 The probability of success for the case where a polynomial number of terms are summed can also be computed and is furthermore also efficient.
 
 
+%=====================================================================
+\section{Filtering Distributions for Time-Dependent Models}
+\label{sec:time-dep}
+%=====================================================================
+
+In practice a physical system whose properties we want to infer is seldom time
+independent. Moreover, by demanding time-invariance, we preclude applications
+to many interesting problem domains outside of physics, such as in financial
+modeling and computer vision. In such cases, the likelihood function $P(E|x)$
+is replaced by $P(E|x;\tau)$ where $\tau$ is the time in the experimental
+system. Thus, the techniques developed do not directly apply to time-dependent
+cases, but rather to the model that results from marginalizing over this time-
+dependence.
+
+There are several ways of dealing with problems involving a time-dependent
+likelihood. The most natural way is by introducing new parameters, called
+\emph{hyperparameters}, that allow the variation of the likelihood function to
+be modeled. Estimation and inference then proceed on the hyperparameters,
+rather than on the latent variables directly. For instance, letting $\omega$
+in the periodic likelihood 
+\eq{simple-precession} be drawn from a stationary Gaussian
+process and then marginalizing over the history of that process results in a
+new hyperparameterized likelihood
+\begin{equation}
+    P(1 | \mu, \sigma; \omega_-, t) = \frac{1}{2} \left(e^{-\frac{1}{2} \sigma ^2 t^2} \cos (\mu  t)+1\right),
+\end{equation}
+where $\mu$ and $\sigma^2$ are the mean and variance of the Gaussian process.
+Using hyperparameters works well for modeling the distribution of the
+dynamics of a model and can be directly implemented using the previously
+discussed methods, but it does little to help track the \emph{instantaneous}
+latent variables of the system.
+
+
+Tracking such variation in the latent variables can be 
+challenging because as Bayesian inference proceeds the certainty in the
+value of the latent variables tends to increase, but if these variables drift beyond the support of the posterior distribution
+then Bayesian inference will never be able to recover. 
+In other words, if the true model for a system drifts into a region that the is not supported by the a prior obtained by previous updates that neglected
+the stochasticity of the latent variables then the algorithm will no longer be able to track the instantaneous value of the latent variable.
+
+%In a similar way, CRej can be extended to include diffusion by using a resampling kernel
+%that has a broader variance than that of the accepted posterior samples. Doing so
+%allows CRej to track stochastic processes in a similar way to sequential Monte--Carlo methods.%, as is illustrated
+%in \fig{crej-diffusion}. %Our proposal thus extends this application to include significantly
+%more challenging likelihood functions.
+
+Fortunately, the SMC literature has already provided a solution to this problem.  Approximate inference algorithms can
+be made to track stochastically varying latent variables, by incorporating a prediction step that diffuses the hidden variables
+of each particle \cite{isard_condensationconditional_1998}. Here, we extend this technique to the our
+quantum algorithm by performing Bayes updates on QFT-transformed posterior
+states. This allows our algorithm to continue enjoying dramatic advantages
+in space complexity even in the presence of time-dependence.
+
+
+In particular, by convolving the prior with a filter function such as a
+Gaussian, the width of the resultant distribution can be increased without
+affecting the prior mean.  This means that the Bayes estimate of the true
+model will remain identical while granting the prior the ability to recover
+from time-variation of the latent variables.  In particular, if we assume
+that at each step Bayesian inference causes the posterior variance to contract
+by a factor of $\alpha$ and  convolution with a filter function causes the
+variance to expand by $\beta$ then the viariance of the resulting distribution
+asymptotes to $\beta/(1-\alpha)$. Thus we can combat $\sigma(x)$ from becoming
+unrealistically small by applying such filtering strategies.
+
+The convolution property of the Fourier transform gives for any two functions $P$ and $Q$
+\begin{equation}
+P \star Q \propto \mathcal{F}^{-1}\left(\mathcal{F}(P) \cdot \mathcal{F}(Q) \right),\label{eq:conv}
+\end{equation}
+where $\star$ is the circular convolution operation.
+The quantum Fourier transform can therefore be used to convolve an unknown $P$ with a known distribution $Q$ that has an efficiently computable Fourier transform $\hat{Q}$.  This
+convolution allows us to filter the prior distribution.
+
+
+\begin{theorem}
+Let  $O_{\hat{Q}}$ be a quantum oracle such that $O_{\hat{Q}}\ket{x} \ket{y} = \ket{x} \ket{y\oplus \sin^{-1}(\hat{Q} (x)/\Gamma_E)}$ where $\hat{Q}:=\mathcal{F}(Q)$ and $\hat{Q}(x)\le \Gamma_E$ and $Q(x) \in \mathbb{C}^{2^n}$.  Then given access to a unitary oracle $O_{\rm in}$ that prepares the state $\sum_x \sqrt{P(x)}\ket{x}$, the state $\sum_x \sqrt{(P\star Q) (x)}\ket{x}$ can be prepared with error $\epsilon$ in the $2$--norm using a number of queries that has an average-case query complexity of $O(\sqrt{\Gamma_E/ \langle \mathcal{F}(P), \mathcal{F}(Q)}\rangle)$ and requires on average $O(n \log(n/\epsilon)\sqrt{\Gamma_E/\langle \mathcal{F}(P), \mathcal{F}(Q)}\rangle)$ one-- and two--qubit gates from the set $\{H,P(\theta),\Lambda (P(\theta))\}$ where $P(\theta):\ket{x}\mapsto e^{2\pi i \theta x} \ket{x}$ for $\theta \in \{y/2^n:y\in \mathbb{Z}_{2^n}\}$ and $\Lambda (P(\theta))$ is its controlled counterpart.
+\end{theorem}
+\begin{proof}
+Notice that Bayes updating the quantum SMC state consists of pointwise multiplication. As a result, applying \lem{rejection} in the Fourier domain, we can implement the convolution described above.  Doing so involves the following process
+\begin{enumerate}
+\item  Fourier transform the current posterior, $\ket{P}:=\sum_x P(x) \ket{x} \mapsto \hat{\mathcal{F}}\left(\sum_x P(x) \ket{x} \right):= \sum_k \omega_k \ket{k}$.
+\item Prepare the Fourier-domain representation of the convolution kernel, \\$\sum_k \omega_k \ket{k}\mapsto \sum_k \omega_k \ket{k}\ket{\sin^{-1}(\sqrt{\hat{Q}(k)/\Gamma_E})}$.
+\item Update by the convolution kernel and transform back, \\$\sum_k \omega_k \ket{k}\ket{\sin^{-1}(\sqrt{\hat{Q}(k)/\Gamma_E})}\mapsto \hat{\mathcal{F}}^{-1}\left(\sum_k \omega_k \ket{k}\ket{0}\left(\sqrt{\hat{Q}(k)/\Gamma_E}\ket{1}+\sqrt{1-\hat{Q}(k)/\Gamma_E}\ket{0} \right)\right)$.
+\end{enumerate}
+If $1$ is measured then the result will implement the circular convolution $P \star Q$ according to~\eq{conv} and Plancherel's theorem.
+
+First, the query complexity of this algorithm is easy to estimate.  The initial state preparation requires a query to $O_{\rm in}$ and the calculation of $\hat{Q}(k)$ requires a query to $P_{\hat{Q}}$.  By using amplitude amplification on the $1$ result, we have that on average $O(\sqrt{\Gamma_E/ \langle \mathcal{F}(P), \mathcal{F}(Q)}\rangle)$ queries are required to prepare the state.
+
+The number of non--query operations is the number of operations needed per attempt at rejection sampling multiplied by the number of attempts made.  Step 1 requires $O(n\log(n/\epsilon))$ gate operations~\cite{CW00} to implement the Fourier transform and its inverse.  Step $2$ only requires query operations.  Step $3$ requires $O(\log(1/\epsilon))$, controlled rotations each of which can be implemented using a constant number of one-- and two--qubit operations to ensure that the rotation on the ancilla qubit is successfully implemented within error $O(\epsilon)$.  It also requires performing the inverse quantum Fourier transform which involves performing $O(n\log(n/\epsilon))$ gates.  Summing these costs gives $O(n\log(n/\epsilon))$.  The quoted scaling of the circuit size then follows by multiplying this by the number of attempts needed to achieve a successful result using amplitude amplification.
+\end{proof}
 %=====================================================================
 \bibliographystyle{apsrev}
 \bibliography{qsmc2}
