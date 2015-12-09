@@ -1,5 +1,5 @@
 
-\documentclass[aps,amsmath,onecolumn,amssymb]{revtex4}
+\documentclass[aps,amsmath,onecolumn,amssymb,notitlepage]{revtex4-1}
 %\documentclass{iopart}
 \usepackage{amssymb}
 \usepackage{amsthm}
@@ -694,6 +694,11 @@ Although our work suggests that small quantum systems may face substantial diffi
 \begin{acknowledgements}
 We would like to thank J. Combes and J. Yard for valuable feedback and discussion as well as J. Emerson for suggesting the idea of quantum learning agents.
 \end{acknowledgements}
+
+%=====================================================================
+\bibliography{qsmc2}
+%=====================================================================
+
 %% APPENDIX %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \appendix
@@ -932,9 +937,5 @@ If $1$ is measured then the result will implement the circular convolution $P \s
 
 First, the query complexity of this algorithm is easy to estimate.  The initial state preparation requires a query to $O_{\rm in}$ and the calculation of $\hat{Q}(k)$ requires a query to $P_{\hat{Q}}$.  By using amplitude amplification on the $1$ result, we have that on average $O(\sqrt{\Gamma_E/ \langle \mathcal{F}(P), \mathcal{F}(Q)}\rangle)$ queries are required to prepare the state.
 \end{proof}
-%=====================================================================
-\bibliographystyle{apsrev}
-\bibliography{qsmc2}
-%=====================================================================
 
 \end{document}
