@@ -286,7 +286,7 @@ Therefore $O(\log(N))$ measurements of $1$ suffice to amplify the probability fr
 
 Similarly, $P(x_m|1) \ge P(x_m)$ unless $1+P(x_m) > 2$ or $P(x_m)<0$.  Since $P(x_m)$ is a probability this is impossible.  Therefore the posterior probability is monotonically increasing with the number of successful updates.  Thus if we define $\alpha^{(1)}_x:= \alpha_x$ and $\alpha_x^{(m)}$ to be the components of the quantum state after $m+1$ quantum updates then $\sqrt{|\alpha_x^{(m)}|^2 P(1|x)}$ is a  monotonically increasing function of $m$.
 
-In practice, it would be unlikely that $O(\log(N))$ sequential measurements would all yield $1$ (i.e. give noisy information about the marked state), but the user of a quantum Bayesian updating algorithm can always pretend that this sequence of observations was obtained similar to~\lem{reduce}. 
+In practice, it would be unlikely that $O(\log(N))$ sequential measurements would all yield $1$ (i.e. give noisy information about the marked state), but the user of a quantum Bayesian updating algorithm can always pretend that this sequence of observations was obtained (similar to~\lem{reduce}) in order to simulate the search. 
 Given the observable variables follow this sequence, \lem{rejection} shows that 
 there exists a quantum algorithm that can perform each such update with probability of success
 \begin{equation}
@@ -379,9 +379,9 @@ This probability can be learned within additive error $\delta$ using $O(1/\delta
 
 This probability can also be learned using the amplitude estimation algorithm.  Amplitude estimation requires that we mark a set of states in order to estimate the probability of measuring a state within that set.  Here we mark all states in~\eq{mark} where the rightmost qubit is $1$. The amplitude estimation algorithm then requires $O(1/\delta)$ queries to $U$ and the above state preparation method to estimate the probability to within error $\delta$ and store it in a qubit register~\cite{BHM+02}.  Amplitude estimation has a probability of success of at least $8/\pi^2$.  The result then follows from taking $\delta=\epsilon/\Delta \lambda$.
 \end{proof}
-
-\lem{ampest} is crucial for our arguments because it provides a method for learning not just the mean of the posterior distribution but also the standard deviation.  This allows us to infer a two parameter model for the posterior distribution in cases where the model is one--dimensional.
-In particular, using $\lambda_x = x$ in~\lem{ampest} yields the mean $x_0$.  The variance can then be computed by taking $\lambda_x = x^2$ and using the fact that $\sigma^2 = \langle x^2\rangle-\langle x\rangle^2$.  The generalization to higher dimensions is straight forward.  
+%
+%\lem{ampest} is crucial for our arguments because it provides a method for learning not just the mean of the posterior distribution but also the standard deviation.  This allows us to infer a two parameter model for the posterior distribution in cases where the model is one--dimensional.
+%In particular, using $\lambda_x = x$ in~\lem{ampest} yields the mean $x_0$.  The variance can then be computed by taking $\lambda_x = x^2$ and using the fact that $\sigma^2 = \langle x^2\rangle-\langle x\rangle^2$.  The generalization to higher dimensions is straight forward.  
 
 
 %Let us assume that the model has $D$ parameters then the cost of performing $1$ update and learning the Gaussian model and each parameter within error $\delta/\max(\Delta \lambda)$ 
@@ -390,6 +390,7 @@ In particular, using $\lambda_x = x$ in~\lem{ampest} yields the mean $x_0$.  The
 %\end{equation}
 %If only the diagonal elements of the covariance matrix are used in the model then the cost becomes linear in $D$.  The quadratic scaling of $D$ will often not be problematic as many realistic o models will have $D\le 100$.
 
+We now turn our attention to estimating the mean and covariance of the posterior distribution that arises from quantum updating.  This is not quite a trivial application of~\lem{ampest} because our method for performing the update is non-unitary, which violates the assumptions of the Lemma.  We avoid this problem by instead estimating these moments in a two--step probability estimation process.  This approach is described in the following corollary.
 
 \begin{corollary}
 Assume that $\lambda_0$ is a vector containing each $\langle x_i\rangle$ and each $\langle x_i x_j \rangle$ evaluated over the prior and $\Delta \lambda \ge \max_k |\bra{P(x|E)} \Lambda_k \ket{P(x|E)}-\lambda_{0,k}|$ where $\Lambda_k$ is the operator corresponding to $x_i$ or $x_ix_j$  depending on the index $k$.  The mean and covariance matrix can be computed within error $\epsilon$ in the max--norm using $\tilde{O}\left(\frac{D^2\Delta \lambda \Gamma_E}{\epsilon \langle P(x), P(E|x)\rangle}\right)$ queries to $O_E$.\label{cor:method}
