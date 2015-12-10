@@ -152,7 +152,7 @@ Bayes' rule is the heart of Bayesian inference.  It gives the correct way to upd
 P(x|E)= \frac{P(E|x) P(x)}{P(E)}= \frac{P(E|x) P(x)}{\langle P(E|x), P(x) \rangle},\label{eq:Bayes}
 \end{equation}
 where $P(E|x)$ is known as the likelihood function and is assumed to either be either numerically or inferred emperically.
-This form of learning has a number of advantages for applications in quantum information processing.  Firstly, it is highly robust to noise and experimental imperfections.  Secondly, it is broadly applicable to almost every data processing problem.  Finally, Bayesian inference provides a probability distribution rather than a point estimate of the model. This allows the uncertainty in the inferred parameter to be directly computed.
+This form of learning has a number of advantages for applications in quantum information processing \cite{granade_robust_2012,ferrie_likelihood-free_2014}.  Firstly, it is highly robust to noise and experimental imperfections.  Secondly, it is broadly applicable to almost every data processing problem.  Finally, Bayesian inference provides a probability distribution rather than a point estimate of the model. This allows the uncertainty in the inferred parameter to be directly computed.
 
 
 
@@ -270,12 +270,12 @@ Let $F$ be a blackbox quantum update algorithm that performs a quantum Bayesian 
 Seeking a contradiction, assume that there exists a quantum algorithm that can perform a quantum Bayesian update using $O(1)$ queries that succeeds with probability $\omega({\sum_x |\alpha_x|^2 P(E|x)})$ for any likelihood function $P(E|x)$.  Next, let us choose the likelihood function to be that used in~\eq{reduceLikelihood} in the reduction proof of~\lem{reduce} and take $\alpha_x =1/\sqrt{N}~\forall~x$.  It is clear from~\lem{rejection} that $\Gamma_E =1$ must be chosen for this problem.  Then by assumption the state $\ket{x_m}$, where $x_m \in X_m$, can be found with probability $\omega({\sum_x |\alpha_x|^2 P(E|x)})\in \omega(1/{N})$.  Since each application of the algorithm requires $O(1)$ queries and success is heralded, $o(\sqrt{N})$ queries are needed on average to learn $x_m$ using amplitude amplification~\cite{BHM+02}, which violates lower bounds for the average query complexity for Grover's problem~\cite{BGH+96}.  Therefore algorithm $G$, which is described in 1, is impossible.
 
 
-Again seeking a contradiction, consider the following likelihood function with outcomes $\{1,0\}$
+Again seeking a contradiction, consider the following likelihood function with outcomes $\{1,0\}$,
 \begin{equation}
 P(1|x) = \begin{cases}
 2/3, & x=x_m \\
 1/3, & x\ne x_m
-\end{cases},~P({0}|x) = 1-P(1|x)\label{eq:bayesgrover}
+\end{cases},~P({0}|x) = 1-P(1|x)\label{eq:bayesgrover}.
 \end{equation}
 For each $x$, $P(1|x)$ can be computed using a single query to $O_E$ and vice versa, thus a query to this likelihood function is equivalent to a call to $O_E$.
 Thus~\eq{Bayes} gives that the posterior probability after measuring $1$ is
