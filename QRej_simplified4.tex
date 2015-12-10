@@ -233,7 +233,7 @@ but this strategy is obviously insufficient to rid the method of its exponential
 
 While the success probability in general falls exponentially, not all failures are catastrophic.  We show in~\app{stability} that a radius of convergence exists such that if the prior distribution is sufficiently close to a delta--function about the true value of the latent variable, and the likelihood function is well behaved, then this updating strategy will cause it to converge to the delta--function.  This convergence occurs even if the user ignores the fact that inference errors can occur and does not attempt to correct such errors.  This means that, for discrete inference problems, the computational complexity of inferring the correct latent parameter need not be infinite.
 
-The reason why the errors in quantum rejection sampling cannot, in general, be efficiently corrected stems from the fact that quantum Bayesian inference algorithm described in~\lem{rejection} can be thought of as a generalization of Grover's algorithm~\cite{Gro96}.  Grover's problem (with one marked element) seeks to find $x = {\rm argmax}( f(x))$ where $O(x)$ is a blackbox Boolean function that is promised to have a unique $x_{\rm mark}$ such that $O(x_{\rm mark})=1$.  The generalization to multiple marked elements is similar.  The reduction between the two problems is formally proved below.
+The reason why the errors in quantum rejection sampling cannot, in general, be efficiently corrected stems from the fact that quantum Bayesian inference algorithm described in~\lem{rejection} can be thought of as a generalization of Grover's algorithm~\cite{Gro96}.  Grover's problem (with one marked element) seeks to find $x = {\rm argmax}( f(x))$ where $f(x)$ is a blackbox Boolean function that is promised to have a unique $x_{\rm mark}$ such that $O(x_{\rm mark})=1$.  The generalization to multiple marked elements is similar.  The reduction between the two problems is formally proved below.
 
 \begin{lemma}\label{lem:reduce}
 Grover's problem with $N$ items and $m$ marked items reduces to Bayesian inference on a prior on $\mathbb{R}^N$.
@@ -259,15 +259,15 @@ The validity of this algorithm is easy to verify from~\eq{Bayes} and it is clear
 
 This reduction of Grover's problem to Bayesian inference brings with it tight lower bounds on the query complexity of solving the problem~\cite{BGH+96}.  This means that we can exploit these bounds to show limitations on our ability to perform Bayesian inference on a quantum computer and also our ability to correct erroneous measurements that occur in the application of the method of~\lem{rejection}.  The following theorem states two such restrictions, which show that the method of~\lem{rejection} cannot be trivially improved nor can its failures be inexpensively corrected. 
 \begin{theorem}
-Let $F$ be a blackbox quantum update algorithm that performs a quantum Bayesian update on an arbitrary pure state $\sum_{x=1}^N \alpha_x \ket{x}$ using $O(1)$ queries to the oracle $O_E$ and has success probability $\Omega({\sum_x |\alpha_x|^2 P(E|x)/\Gamma_E})$ for $\Gamma_E \le \max_x P(E|x)\le 1$.  The following are impossible.
+Let $F$ be a blackbox quantum update algorithm that performs a quantum Bayesian update on an arbitrary pure state $\sum_{x=1}^N \alpha_x \ket{x}$ using $O(1)$ queries to the oracle $O_E$ and is heralded and has success probability $\Omega({\sum_x |\alpha_x|^2 P(E|x)/\Gamma_E})$ for $\Gamma_E \le \max_x P(E|x)\le 1$.  The following are impossible.
 \begin{enumerate}
-\item A blackbox algorithm $G$ capable of performing a quantum Bayesian update of an arbitrary pure quantum state of the form $\sum_{x=1}^N \alpha_x \ket{x}$ that uses $O(1)$ queries to $O_E$ and has  success probability $\omega({\sum_x |\alpha_x|^2 P(E|x)/\Gamma_E})$.
+\item A blackbox algorithm $G$ capable of performing a quantum Bayesian update of an arbitrary pure quantum state of the form $\sum_{x=1}^N \alpha_x \ket{x}$ that uses $O(1)$ queries to $O_E$ that is heralded and has  success probability $\omega({\sum_x |\alpha_x|^2 P(E|x)/\Gamma_E})$.
 \item A blackbox algorithm $H$ that requires $o(\sqrt{N}/\log(N))$ queries to $O_E$ to undo the effects that $F$ applies to the arbitrary state $\sum_{x=1}^N \alpha_x \ket{x}$ upon a failed update.
 \item A blackbox algorithm $I$ capable of performing a quantum Bayesian update of an arbitrary pure quantum state of the form $\sum_{x=1}^N \alpha_x \ket{x}$ that, for all $O_E$, uses on average $o(\sqrt{N})$ queries to $O_E$.
 \end{enumerate}
 \end{theorem}
 \begin{proof}
-Seeking a contradiction, assume that there exists a quantum algorithm that can perform a quantum Bayesian update with probability $\omega({\sum_x |\alpha_x|^2 P(E|x)})$ for any likelihood function $P(E|x)$.  Next, let us choose the likelihood function to be that used in~\eq{reduceLikelihood} in the reduction proof of~\lem{reduce} and take $\alpha_x =1/\sqrt{N}~\forall~x$.  It is clear from~\lem{rejection} that $\Gamma_E =1$ must be chosen for this problem.  Then by assumption the state $\ket{x_m}$, where $x_m \in X_m$, can be found with probability $\omega({\sum_x |\alpha_x|^2 P(E|x)})= \omega(1/{N})$.  Since each application of the algorithm requires $O(1)$ queries, $o(\sqrt{N})$ queries are needed on average to learn $x_m$ using amplitude amplification, which violates lower bounds for the average query complexity for Grover's problem~\cite{BGH+96}.  Therefore algorithm $G$, which is described in 1, is impossible.
+Seeking a contradiction, assume that there exists a quantum algorithm that can perform a quantum Bayesian update with probability $\omega({\sum_x |\alpha_x|^2 P(E|x)})$ for any likelihood function $P(E|x)$.  Next, let us choose the likelihood function to be that used in~\eq{reduceLikelihood} in the reduction proof of~\lem{reduce} and take $\alpha_x =1/\sqrt{N}~\forall~x$.  It is clear from~\lem{rejection} that $\Gamma_E =1$ must be chosen for this problem.  Then by assumption the state $\ket{x_m}$, where $x_m \in X_m$, can be found with probability $\omega({\sum_x |\alpha_x|^2 P(E|x)})\in \omega(1/{N})$.  Since each application of the algorithm requires $O(1)$ queries and success is heralded, $o(\sqrt{N})$ queries are needed on average to learn $x_m$ using amplitude amplification~\cite{BHM+02}, which violates lower bounds for the average query complexity for Grover's problem~\cite{BGH+96}.  Therefore algorithm $G$, which is described in 1, is impossible.
 
 
 Again seeking a contradiction, consider the following likelihood function with outcomes $\{1,0\}$
@@ -277,7 +277,7 @@ P(1|x) = \begin{cases}
 1/3, & x\ne x_m
 \end{cases},~P({0}|x) = 1-P(E|x)\label{eq:bayesgrover}
 \end{equation}
-For each $x$, $P(1|x)$ can be computed using a single query to $O$ and vice versa, thus a query to this likelihood function is equivalent to a call to $O$.
+For each $x$, $P(1|x)$ can be computed using a single query to $O_E$ and vice versa, thus a query to this likelihood function is equivalent to a call to $O_E$.
 Thus~\eq{Bayes} gives that the posterior probability after measuring $1$ is
 \begin{equation}
 P(x_m|1)=\frac{2P(x_m)}{1 + P(x_m)}=2P(x_m) + O(P(x_m)^2).
@@ -392,12 +392,13 @@ In particular, using $\lambda_x = x$ in~\lem{ampest} yields the mean $x_0$.  The
 
 
 \begin{corollary}
-Assume that the components of the mean of the prior distribution over model vectors are $\{\lambda_{0,j}:j=1\ldots D(D+1)\}$ and $\Delta \lambda \ge \max_j |\langle \Lambda_j \rangle-\lambda_{0,j}|$ where $\Lambda_j$ is the operator corresponding to $x$ or $x^2$  depending on the index $j$.  The mean and covariance matrix can be computed within error $\epsilon$ using $\tilde{O}\left(\frac{D^2\Delta \lambda \Gamma_E}{\epsilon \langle P(x), P(E|x)\rangle}\right)$ queries to $O_E$.\label{cor:method}
+Assume that the components of the mean of the prior distribution over model vectors are $\{\lambda_{0,j}:j=1\ldots D(D+1)\}$ and $\Delta \lambda \ge \max_j |\langle \Lambda_j \rangle-\lambda_{0,k}|$ where $\Lambda_k$ is the operator corresponding to $x$ or $x^2$  depending on the index $k$.  The mean and covariance matrix can be computed within error $\epsilon$ using $\tilde{O}\left(\frac{D^2\Delta \lambda \Gamma_E}{\epsilon \langle P(x), P(E|x)\rangle}\right)$ queries to $O_E$.\label{cor:method}
 \end{corollary}
 \begin{proof}
-In order to apply the reasoning of~\lem{ampest} to estimate the posterior mean and variance, we need to prepare the following state conditioned on evidence $E$
+Our method works by classicially looping over all the components of $\lambda_0$ vector, which we denote $\lambda_{0,k}$
+In order to apply the reasoning of~\lem{ampest} to estimate the posterior mean and variance, we need to prepare the following state conditioned on evidence $E$ and comp
 \begin{equation}
-\sum_{x} \sqrt{\frac{P(x|E)}{2}} \ket{x}\ket{\lambda_x}\left(\sqrt{1+\frac{\lambda_x-\lambda_{0,x} }{\Delta \lambda}}\ket{1} + \sqrt{1-\frac{\lambda_x-\lambda_{0,x} }{\Delta \lambda}}\ket{0} \right),\label{eq:hadtest2}
+\sum_{x} \sqrt{\frac{P(x|E)}{2}} \ket{x}\ket{\lambda_x}\left(\sqrt{1+\frac{\lambda_x-\lambda_{0,k} }{\Delta \lambda}}\ket{1} + \sqrt{1-\frac{\lambda_x-\lambda_{0,k} }{\Delta \lambda}}\ket{0} \right),\label{eq:hadtest2}
 \end{equation}
 where $\lambda_x =x$ or $\lambda_x =x^2$.
 
