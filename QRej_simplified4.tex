@@ -424,7 +424,7 @@ Below we combine these ideas to construct an online quantum algorithm that is ca
 \begin{theorem}
 Let $F(x;\mu, \Sigma)$ be a family of approximations to the posterior distribution parameterized by the posterior mean $\mu$ and the posterior covariance matrix $\Sigma$ and $\{E_k: k=1,\ldots L\}$ be a set of $L$ observable variables.  Then a semi--classical update of a quantum state $\sum_x \sqrt{P(x)} \ket{x}$ can be performed using a number of queries to $O_E$ that is in
 $$
-\tilde{O} \left(\frac{LD^2 \Delta  \lambda\Gamma_{E_k}}{\epsilon \langle  P(x), \prod_{k=1}^LP(E_k|x)\rangle} \right).
+\tilde{O} \left(\frac{LD^2 \Delta  \lambda}{\epsilon \langle  P(x), \prod_{k=1}^LP(E_k|x)/\Gamma_{E_k}\rangle} \right).
 $$
 \end{theorem}
 \begin{proof}
@@ -435,9 +435,9 @@ The algorithm is simple.
 \item Return these quantities, which give a parameterization of the approximation to the posterior distribution.
 \end{enumerate}
 
-After step 1, we have from the independence of the successes that the probability of all $L$ updates succeeding is $\sum_x P(x) \prod_{k=1}^L P(E_k|x)/\Gamma_{E_k}$.  Thus step 2 can be performed using $\tilde{O}\left(\frac{D^2\Delta \lambda \Gamma_{E_k}}{\epsilon \langle w, \prod_k P(E_k|x)\rangle}\right)$ preparations of the posterior state from~\cor{method}.  Since each such preparation requires $L$ queries to $O_E$ the total query complexity required to learn the posterior mean and variance is
+After step 1, we have from the independence of the successes that the probability of all $L$ updates succeeding is $\sum_x P(x) \prod_{k=1}^L P(E_k|x)/\Gamma_{E_k}$.  Thus step 2 can be performed using $\tilde{O}\left(\frac{D^2\Delta \lambda}{\epsilon \langle w, \prod_k P(E_k|x)/\Gamma_{E_k}\rangle}\right)$ preparations of the posterior state from~\cor{method}.  Since each such preparation requires $L$ queries to $O_E$ the total query complexity required to learn the posterior mean and variance is
 \begin{equation}
-\tilde{O} \left(\frac{LD^2 \Delta \lambda\Gamma_{E_k} }{\epsilon \langle  P(x), \prod_{k=1}^LP(E_k|x)\rangle} \right)
+\tilde{O} \left(\frac{LD^2 \Delta \lambda }{\epsilon \langle  P(x), \prod_{k=1}^LP(E_k|x)/\Gamma_{E_k}\rangle} \right)
 \end{equation}
 
 Finally, since the algorithm outputs the mean and covariance matrix of the posterior distribution, it outputs a function $F(x;\mu,\sigma)$ that captures (to within error $\epsilon$) the first two moments of the posterior distribution.  Thus the algorithm clearly performs a semi--classical update as per~\defn{semi}.
