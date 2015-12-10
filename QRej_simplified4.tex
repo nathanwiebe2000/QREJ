@@ -132,7 +132,7 @@ Proof of~#1.}}
 }
 \begin{abstract}
 %We present a new quantum algorithm for approximate Bayesian inference that can efficiently estimate the low order moments of the posterior distribution in an online setting modulo reasonable assumptions on the likelihood function.  Our method does so by using a non-deterministic quantum algorithm to infer a simple model for the posterior distribution, which allows it to efficiently learn in an online fashion without measurement errors causing the posterior distribution to be lost.  We further show that the success probability of our algorithm is optimal in the sense that an asymptotic improvement to the algorithm's success probability would violate lower bounds for unstructured search and also provide quantum methods for adaptive experiment design and learning in the presence of stochastically varying latent variables.
-We examine the question of whether quantum mechanics places limitations on the ability of small quantum devices to learn.  We specifically examine the question in the context of Bayesian inference, wherein the prior and posterior distributions are encoded in the quantum state vector.  We conclude based on lower bounds from Grover's search that an efficient blackbox method for updating the distribution is impossible.  We then address this by providing a new form of approximate quantum Bayesian inference that is tractable if the quantum system is augmented with classical memory or if the low--order moments of the distribution are protected using a repetition code.  This work suggests that there may be a connection between fault tolerance and the capacity of a quantum system to learn from its surroundings.
+We examine the question of whether quantum mechanics places limitations on the ability of small quantum devices to learn.  We specifically examine the question in the context of Bayesian inference, wherein the prior and posterior distributions are encoded in the quantum state vector.  We conclude based on lower bounds from Grover's search that an efficient blackbox method for updating the distribution is impossible.  We then address this by providing a new adaptive form of approximate quantum Bayesian inference that is polynomially faster than its classical anolog and tractable if the quantum system is augmented with classical memory or if the low--order moments of the distribution are protected using a repetition code.  This work suggests that there may be a connection between fault tolerance and the capacity of a quantum system to learn from its surroundings.
 \end{abstract}
 \maketitle
 \section{Introduction}
@@ -169,10 +169,11 @@ There are several features that can make Bayesian inference computationally expe
 %---------------------------------------------------------------------
 \section{Quantum Bayesian updating}
 %---------------------------------------------------------------------
-Quantum theory is often viewed as a generalization of classical probability theory, which suggests that the notion of a Bayesian update may require re--assessment in quantum computing.  Indeed, there are several natural analogues of quantum Bayesian updating that can be thought of in a quantum setting.
-Our objective in this section is to provide a definition for what we mean by a quantum Bayesian update and show a concrete protocol for implementing a quantum Bayesian update.  We will then show that this method cannot generically be efficient and furthermore that asymptotic improvements to the algorithm or an inexpensive error correction algorithm for its faults would violate lower bounds on Grover's search.  These results motivate our definition of ``semi--classical'' Bayesian updating in the subsequent section.
+In order to investigate the question of whether small quantum systems can learn efficiently, we will examine the issue through the lens of Bayesian inference.
+Our first objective in this section is to provide a concrete definition for what we mean by a quantum Bayesian update and show a protocol for implementing a quantum Bayesian update.  We will then show that this method cannot generically be efficient and furthermore that asymptotic improvements to the algorithm or an inexpensive error correction algorithm for its faults would violate lower bounds on Grover's search.  These results motivate our definition of ``semi--classical'' Bayesian updating in the subsequent section.
 
- A key assumption that we make here and in the subsequent text is that the visible and latent variables are discrete.  In other words, we assume that each experiment has a discrete set of outcomes and there are a discrete set of hypotheses that could explain the data.  We then use these assumptions to make the following definition of a quantum Bayesian update.
+ A key assumption that we make here and in the subsequent text is that the visible and latent variables are discrete.  In other words, we assume that each experiment has a discrete set of outcomes and there are a discrete set of hypotheses that could explain the data.    Continuous problems can, however, be approximated by discrete models and we provide error bounds for doing so in~\app{discrete}.  We then invoke these assumptions in the following definition of a quantum Bayesian update.  
+
 \begin{definition}\label{def:qbayes}
 A quantum Bayesian update of a prior state $\sum_x \sqrt{P(x)} \ket{x}$ performs, for observable variable $E$ and likelihood function $P(E|x)$, the map 
 $$\sum_x \sqrt{P(x)} \ket{x}\mapsto  \sum_x \sqrt{P(x|E)} \ket{x}. $$
@@ -233,7 +234,7 @@ but this strategy is obviously insufficient to rid the method of its exponential
 
 While the success probability in general falls exponentially, not all failures are catastrophic.  We show in~\app{stability} that a radius of convergence exists such that if the prior distribution is sufficiently close to a delta--function about the true value of the latent variable, and the likelihood function is well behaved, then this updating strategy will cause it to converge to the delta--function.  This convergence occurs even if the user ignores the fact that inference errors can occur and does not attempt to correct such errors.  This means that, for discrete inference problems, the computational complexity of inferring the correct latent parameter need not be infinite.
 
-The reason why the errors in quantum rejection sampling cannot, in general, be efficiently corrected stems from the fact that quantum Bayesian inference algorithm described in~\lem{rejection} can be thought of as a generalization of Grover's algorithm~\cite{Gro96}.  Grover's problem (with one marked element) seeks to find $x = {\rm argmax}( f(x))$ where $f(x)$ is a blackbox Boolean function that is promised to have a unique $x_{\rm mark}$ such that $O(x_{\rm mark})=1$.  The generalization to multiple marked elements is similar.  The reduction between the two problems is formally proved below.
+The reason why the errors in quantum rejection sampling cannot, in general, be efficiently corrected stems from the fact that quantum Bayesian inference algorithm described in~\lem{rejection} can be thought of as a generalization of Grover's algorithm~\cite{Gro96}.  Grover's problem (with one marked element) seeks to find $x = {\rm argmax}( f(x))$ where $f(x)$ is a blackbox Boolean function that is promised to have a unique $x_{\rm mark}$ such that $f(x_{\rm mark})=1$.  The generalization to multiple marked elements is similar.  The reduction between the two problems is formally proved below.
 
 \begin{lemma}\label{lem:reduce}
 Grover's problem with $N$ items and $m$ marked items reduces to Bayesian inference on a prior on $\mathbb{R}^N$.
@@ -300,13 +301,15 @@ obtained with an average number of queries that is in
 o\left( \frac{\sqrt{N}}{\log(N)\sqrt{\sum_x |\alpha_x|^2 P(1|x)}}\right)\in o\left(\frac{\sqrt{N}}{\log(N)} \right),
 \end{equation}
 because $\sqrt{|\alpha_x^{(m)}|^2 P(1|x)}\ge \sqrt{|\alpha_x|^2 P(1|x)}$ for any $m\ge 1$.
-Since $O(\log(N))$ successful quantum updates are made in the inference process, the marked state can be inferred within probability $p\in \Theta(1)$ using $o(\sqrt{N})$ queries to the likelihood function.  Since a query
-to the likelihood function is equivalent to a query to Grover's oracle, error correction method $H$ (described in 2) is impossible.
+Since $O(\log(N))$ successful quantum updates are made in the inference process, the marked state can be inferred within probability $p\in \Theta(1)$ using $o(\sqrt{N})$ queries to the likelihood function.  A
+to the likelihood function is equivalent to a query to Grover's oracle and thus error correction method $H$ (described in 2) is impossible.
 
 Finally, the impossibility of method $I$ directly follows from~\lem{reduce} and lower bounds on Grover's search.
 \end{proof}
 
-These impossibility results show that the quantum updating procedure of~\cite{LYC14} and~\lem{rejection} cannot be improved  without making assumptions about the underlying prior distributions or likelihood functions.  This inefficiency is perhaps unsurprising as exact Bayesian inference is also classically inefficient.  In particular, an efficient sampling algorithm from a distribution that is a close approximation to the  posterior distribution would imply $\P=\NP$~\cite{dagum1993approximating}.  A quantum algorithm capable of efficient Bayesian inference for general models would similarly imply that $\NP \subseteq \BQP$, which is false under reasonable complexity theoretic conjectures.
+These impossibility results show that the quantum updating procedure of~\cite{LYC14} and~\lem{rejection} cannot be improved  without making assumptions about the underlying prior distributions or likelihood functions.  From this we conclude that quantum Bayesian updating, as per~\defn{qbayes}, is inneficient in general.  This means that small quantum systems that attempt to store the prior and posterior vectors as a quantum state vector cannot do so efficiently, let alone output salient properties of the state, without making such assumptions.
+
+This inefficiency is perhaps unsurprising as exact Bayesian inference is also classically inefficient.  In particular, an efficient sampling algorithm from a distribution that is a close approximation to the  posterior distribution would imply $\P=\NP$~\cite{dagum1993approximating}.  A quantum algorithm capable of efficient Bayesian inference for general models would similarly imply that $\NP \subseteq \BQP$, which is false under reasonable complexity theoretic conjectures.
 
 Although it may not be surprising that quantum Bayesian updating is not generically efficient, it is perhaps surprising that both it and classical updating fail to be efficient for different reasons.  Classical Bayesian updating fails to be efficient because it needs to store prior and posterior probabilities for an exponentially large number of hypotheses; however, its cost scales linearly with the number of updates used.  In contrast, quantum Bayesian updating scales polynomially with the number of hypotheses considered but scales exponentially with the number of updates.  This invites the question of whether it is possibile to combine the best features of quantum and classical Bayesian updating.  We do so in the subsequent section, wherein we show how a classical model can be stored for the system that can be reverted to in the event that a failure is observed in a quantum Bayesian update.
 
@@ -348,8 +351,6 @@ Approximations are therefore often needed to make both classical as well as quan
 We attack the problem by making our quantum algorithm a little more classical, meaning that through out the learning process we aim to learn an approximate classical model for the posterior alongside the quantum algorithm.  This classical model allowsus to approximately re--prepare the state should an update fail throughout the updating process.  This removes the exponential scaling, but results in an approximate inference.  We refer to this procedure as \emph{quantum resampling} as it is reminiscent of resampling in sequential Monte--Carlo algorithms or other particle filter methods such as assumed-density filtering~\cite{minka2001expectation}.  In order to prepare the distribution,
 we model the posterior distribution as a Gaussian distribution with mean and covariance equal to that of the true posterior.  This choice is sensible because once the Gaussian distribution is specified, the Grover--Rudolph state preparation method~\cite{GR02} can be used to prepare such states as their cumulative distribution functions can be efficiently computed.
 Alternatively, for one--dimensional problems, such states could be manufactured by approximate cloning.
-
-In the following we will assume that the latent variable $x$ is discrete.  This is necessary for the algorithm to be computationally efficient.  Continuous problems can, however, be approximated by discrete models and we provide error bounds for doing so in~\app{discrete}.
 
 We are now equipped to define a semi-classical Bayesian update.
 \begin{definition}
@@ -495,9 +496,11 @@ be modified to robustly track its variation in time.  This is discussed in more 
 
 \section{Adaptive experiment design}
 
-Bayesian methods can also be used in an online fashion to design new
-experiments to perform, given the current knowledge that one has about a
-system of interest. Here, we show that our algorithm allows for quantum
+In science and engineering, inference problems frequently involve decision variables that can
+be set in order to optimize the performance of the algorithm.  For example, in the phase estimation 
+algorithm such a decision variable may be the amount of time that the system is allowed to 
+evolve for.  Finding locally optimal parameters for inference can be computationally challenging
+(especially for online learning problems). Here, we show that our algorithm allows for quantum
 computing to be used to perform Bayesian experiment design with significant
 advantages over classical methods.
 
@@ -649,9 +652,7 @@ Another interesting feature of this approach is that we do not explicitly use th
 
 \section{Quantum Bayesian updating using repetition codes}
 While we have addressed a semi--classical form of learning for quantum Bayesian inference, an interesting remaining question is whether the form of quantum
-Bayesian inference that we consider has a well defined classical limit.  The hope would be that such a protocol would also be an approximate Bayesian method, but would not be susceptible to the probabilistic failures that plague the quantum approach.
-
-The way that the classical limit is reached depends strongly on the correspondence taken between the quantum and classical variables that model the system.  In this case, we assume that we wish to find an algorithm that, in the limit of an infinite number of copies, allows the means and covariances of the quantum distribution to be extracted without disturbing the underlying posterior distribution.  We achieve this in effect by using a repetition code.  We focus on the one-dimensional case, but generalization to the multi-dimensional case is straightforward.
+Bayesian inference that we consider has a well defined classical limit.  The hope would be that such a protocol would also be an approximate Bayesian method, but would not be susceptible to the probabilistic failures that plague the quantum approach.  We can reach such a limit by using a repetition code to perform a protocol that is similar to semi--classical updating, but does not involve storing classical information.  We also focus on the one-dimensional case in the following, but generalization to the multi-dimensional case is straightforward.
 
 The repetition code that allows us to reach the classical limit of the quantum algorithm is trivial:
 \begin{equation}
@@ -667,25 +668,28 @@ Let $\mu= \sum_j P(x_j) x_j$ be the true mean.  Then as each of the distribution
 \begin{equation}
 P\left(\left|\bar{x} - \mu\right|\ge \Delta \right)\le e^{-\frac{\Delta^2 K}{3\mu X_{\rm max}}}.
 \end{equation}
-Thus the probability of measuring a mean that deviates more than $\Delta$ from $\mu$ is at most $\epsilon$ if
+Thus the probability of measuring a mean that deviates more than $\Delta$ from $\mu$ is at most $\delta$ if
 \begin{equation}
-K\ge \frac{3\mu X_{\rm max}}{\Delta^2}\ln\left(\frac{1}{\epsilon} \right).
+K\ge \frac{3\mu X_{\rm max}}{\Delta^2}\ln\left(\frac{1}{\delta} \right).
 \end{equation}
-This implies that for every $\epsilon>0$ and every discretization error $\Delta$ there exists a value of $K$ such that the probability of measuring the discretized mean to be $\mu$ is at least $1-\epsilon$.
+This implies that for every $\delta>0$ and every discretization error $\Delta$ there exists a value of $K$ such that the probability of measuring the discretized mean to be $\mu$ is at least $1-\delta$.
 
 Let $\ket{\phi} = (\openone \otimes \ketbra{\mu}{\mu}) \ket{\psi} / |(\openone \otimes \ketbra{\mu}{\mu}) \ket{\psi}|$ then
 \begin{equation}
-|\braket{\psi}{\phi}|^2 = \frac{|\bra{\psi} (\openone \otimes \ketbra{\mu}{\mu}) \ket{\psi}|^2}{|(\openone \otimes \ketbra{\mu}{\mu}) \ket{\psi}|^2} \ge \frac{1-\epsilon}{|(\openone \otimes \ketbra{\mu}{\mu}) \ket{\psi}|^2} \ge 1-\epsilon.
+|\braket{\psi}{\phi}|^2 = \frac{|\bra{\psi} (\openone \otimes \ketbra{\mu}{\mu}) \ket{\psi}|^2}{|(\openone \otimes \ketbra{\mu}{\mu}) \ket{\psi}|^2} \ge \frac{1-\delta}{|(\openone \otimes \ketbra{\mu}{\mu}) \ket{\psi}|^2} \ge 1-\delta.
 \end{equation}
-Thus up to error $O(\epsilon)$, we can treat the state after learning the mean as identical to the state that existed before learning $\mu$.  Ergo despite the fact that the $x_i$ used in the distribution are no longer identically distributed, we can treat them as if they were while incurring an error of at most $\epsilon$ in the estimate of $P(|\bar{x} - \mu|\le \Delta)$.  
+Thus up to error $O(\delta)$, we can treat the state after learning the mean as identical to the state that existed before learning $\mu$.  Ergo despite the fact that the $x_i$ used in the distribution are no longer identically distributed, we can treat them as if they were while incurring an error of at most $\delta$ in the estimate of $P(|\bar{x} - \mu|\le \Delta)$.  
 From the triangle inequality, it is then straight forward to see that after $L$ such steps that the total error incurred in the final state (as measured by the trace distance) is at most $L\sqrt{\epsilon}$, which can be made at most $\sqrt{\epsilon}$ by choosing 
 \begin{equation}
-K\ge \frac{3\mu X_{\rm max}}{\Delta^2}\ln\left(\frac{L}{\sqrt{\epsilon}} \right).
+K\ge \frac{3\mu X_{\rm max}}{\Delta^2}\ln\left(\frac{L^2}{{\epsilon}} \right).
 \end{equation}
 This in turn means that the error in the inference of $\mu$ after $L$ steps is at most $X_{\rm max} \epsilon$.  The exact same argument can be applied to learn the mean--square value of $x$ and so the standard deviation can be learned in a similar fashion.
 
+If $K$ is sufficiently large, then any branches that fail can be immediately repopulated by a distribution from a two--parameter family of distributions $F(x;\mu,\sigma^2)$.  This further carries an advantage because it does not necessitate that the entire distribution be approximated at each iteration, unlike semi--classical updating.
+
 This shows that a redundant encoding can be used in order to protect the low--order moments against the effects of measurement.  Therefore means that even if some updates fail then these results can be erased and replaced with a Gaussian approximation to the posterior distribution (for example).  An explicit classical register is not needed in this approach, although since the entanglement of the expectation value register with the remaining qubits approaches zero.  In this sense, it becomes a classical register and this result can also be thought of as an examination of the classical limit of quantum Bayesian updating.
 
+While this shows that repetition codes can allow the algorithm to proceed without classical memory, it makes substantial demands on the memory.  For even modest problems, it is likely to require thousands of copies of the state in order to be able to resist the effects of measurement back action on the state.  This shows that while error correction can allow quantum systems able to learn efficiently without classical memory, the resulting systems will seldom be small.  This suggests that there may be a tradeoff between system size and robustness that may make learning in small quantum systems highly challenging.
 
 \section{Conclusion}
 Our main contribution of this paper can be thought of as an analysis of the ability of small quantum systems' capacity to learn.  In it we have examined a class of quantum learning algorithms that require only logarithmic memory to update a register that stores its beliefs about a latent variable $x$ that it must infer from a set of observable variables $E$ that whose likelihoods are only known through access to a quantum oracle.  We show that such algorithms cannot in general be efficient, but provide a semi--classical algorithm that uses classical memory to circumvent this problem within the context of approximate Bayesian inference.
