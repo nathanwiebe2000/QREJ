@@ -392,11 +392,11 @@ In particular, using $\lambda_x = x$ in~\lem{ampest} yields the mean $x_0$.  The
 
 
 \begin{corollary}
-Assume that the components of the mean of the prior distribution over model vectors are $\{\lambda_{0,j}:j=1\ldots D(D+1)\}$ and $\Delta \lambda \ge \max_j |\langle \Lambda_j \rangle-\lambda_{0,k}|$ where $\Lambda_k$ is the operator corresponding to $x$ or $x^2$  depending on the index $k$.  The mean and covariance matrix can be computed within error $\epsilon$ using $\tilde{O}\left(\frac{D^2\Delta \lambda \Gamma_E}{\epsilon \langle P(x), P(E|x)\rangle}\right)$ queries to $O_E$.\label{cor:method}
+Assume that $\lambda_0$ is a vector containing each $\langle x_i\rangle$ and each $\langle x_i x_j \rangle$ evaluated over the prior and $\Delta \lambda \ge \max_k |\langle \Lambda_k \rangle-\lambda_{0,k}|$ where $\Lambda_k$ is the operator corresponding to $x_i$ or $x_ix_j$  depending on the index $k$.  The mean and covariance matrix can be computed within error $\epsilon$ in the max--norm using $\tilde{O}\left(\frac{D^2\Delta \lambda \Gamma_E}{\epsilon \langle P(x), P(E|x)\rangle}\right)$ queries to $O_E$.\label{cor:method}
 \end{corollary}
 \begin{proof}
-Our method works by classicially looping over all the components of $\lambda_0$ vector, which we denote $\lambda_{0,k}$
-In order to apply the reasoning of~\lem{ampest} to estimate the posterior mean and variance, we need to prepare the following state conditioned on evidence $E$ and comp
+Our method works by classicially looping over all the components of the $\lambda_0$ vector, which we denote $\lambda_{0,k}$
+In order to apply the reasoning of~\lem{ampest} to estimate the expectation value of $x_k$ or $x_k^2$ (as appropriate), we need to prepare the following state conditioned on evidence $E$ to compute the corresponding probability 
 \begin{equation}
 \sum_{x} \sqrt{\frac{P(x|E)}{2}} \ket{x}\ket{\lambda_x}\left(\sqrt{1+\frac{\lambda_x-\lambda_{0,k} }{\Delta \lambda}}\ket{1} + \sqrt{1-\frac{\lambda_x-\lambda_{0,k} }{\Delta \lambda}}\ket{0} \right),\label{eq:hadtest2}
 \end{equation}
@@ -415,7 +415,7 @@ If we estimate $P(1)$ and $P(11)$ within error $O(\delta)$ then the error in $\l
 \begin{equation}
 \tilde{O} \left(\frac{\Gamma_E \Delta \lambda}{\epsilon \sum_x P(x) P(E|x)} \right).
 \end{equation}
-The result then follows from noting that there are $O(D^2)$ different values of $k$ that need to be computed.
+The result then follows from noting that there are $O(D^2)$ different values of $k$ that need to be computed to learn the expectation values needed to compute the components of the posterior mean and covariance matrix.
 \end{proof}
 This shows that if we require modest relative error (i.e. $\Delta \lambda \in O(\epsilon)$) and $\Gamma_E$ is reasonably tight then this process is highly efficient.  In contrast, previous results that do not use these factors that incorporate apriori knowledge of the scale of these terms may not be efficient under such assumptions.
 
