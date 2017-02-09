@@ -132,7 +132,7 @@ Proof of~#1.}}
 }
 \begin{abstract}
 %We present a new quantum algorithm for approximate Bayesian inference that can efficiently estimate the low order moments of the posterior distribution in an online setting modulo reasonable assumptions on the likelihood function.  Our method does so by using a non-deterministic quantum algorithm to infer a simple model for the posterior distribution, which allows it to efficiently learn in an online fashion without measurement errors causing the posterior distribution to be lost.  We further show that the success probability of our algorithm is optimal in the sense that an asymptotic improvement to the algorithm's success probability would violate lower bounds for unstructured search and also provide quantum methods for adaptive experiment design and learning in the presence of stochastically varying latent variables.
-We examine the question of whether quantum mechanics places limitations on the ability of small quantum devices to learn.  We specifically examine the question in the context of Bayesian inference, wherein the prior and posterior distributions are encoded in the quantum state vector.  We conclude based on lower bounds from Grover's search that an efficient blackbox method for updating the distribution is impossible.  We then address this by providing a new adaptive form of approximate quantum Bayesian inference that is polynomially faster than its classical anolog and tractable if the quantum system is augmented with classical memory or if the low--order moments of the distribution are protected using a repetition code.  This work suggests that there may be a connection between fault tolerance and the capacity of a quantum system to learn from its surroundings.
+We examine the question of whether quantum mechanics places limitations on the ability of small quantum devices to learn.  We specifically examine the question in the context of Bayesian inference, wherein the prior and posterior distributions are encoded in the quantum state vector.  We conclude based on lower bounds from Grover's search that an efficient blackbox method for updating the distribution is impossible.  We then address this by providing a new adaptive form of approximate quantum Bayesian inference that is polynomially faster than its classical anolog and tractable if the quantum system is augmented with classical memory or if the low--order moments of the distribution are protected through redundant preparation.  This work suggests that there may be a connection between fault tolerance and the capacity of a quantum system to learn from its surroundings.
 \end{abstract}
 \maketitle
 \section{Introduction}
@@ -177,7 +177,7 @@ We then say that this system  \emph{learns} if
 \end{enumerate}
 \end{definition}
 
-If we were examining classical learning, then the first two requirements often suffice to give a useful definition of learning.  This is because classical information, in the form of bit strings, can be copied and acted upon without consequence.  On the other hand, quantum data cannot be copied, hence we insert the remaining two requirements to emphasize that in our setting one cannot claim to have learned a concept simply by owning a quantum state.  Instead, one has to be able to extract actionable understanding from such a state to claim to have learned from it.  Furthermore, we require that in settings where the error in extracting understanding is non--zero that such errors can be made arbitrarily small using polynomial resources.  With this definition in hand, we will now proceed to look at the challenges faced when trying to apply quantum Bayesian inference to learn about a system.
+If we were examining classical learning, then the first two requirements often suffice to give a useful definition of learning.  This is because classical information, in the form of bit strings, can be copied and acted upon without consequence.  On the other hand, quantum data cannot be copied, hence we insert the remaining two requirements to emphasize that in our setting one cannot claim to have learned a concept simply by owning a quantum state.  Instead, one has to be able to extract actionable understanding from such a state to claim to have learned from it.  Furthermore, we require that in settings where the error in extracting understanding is non--zero that such errors can be made arbitrarily small using polynomial resources.  With this definition in hand, we will now proceed to look at the challenges faced when trying to apply quantum Bayesian inference to learn about a system with and without access to classical memory.
 %\begin{equation}
 %P(x) \approx \sum_j w_j \delta_{x-x_j}.
 %\end{equation}
@@ -210,7 +210,7 @@ An interesting consequence of the above assumptions and~\defn{qbayes} is that in
 The following lemma discusses how to implement such a non--deterministic quantum Bayesian update.  It can also be thought of as a generalization of the result of~\cite{LYC14} to an oracular setting.
 
 \begin{lemma}
-Given an initial state $\sum_x \sqrt{P(x)} \ket{x}$ and $\Gamma_E : P(E|x) \le \Gamma_E$ the state $\sum_x \sqrt{P(x|E)} \ket{x}$ can be prepared using an expected number of queries to $O_E$ that is in $O(\sqrt{\Gamma_E/\langle P(x), P(E|x)\rangle})$.\label{lem:rejection}
+Given a unitary operator, $U$, such that $U\ket{0} = \sum_x \sqrt{P(x)} \ket{x}$ and $\Gamma_E : P(E|x) \le \Gamma_E$ the state $\sum_x \sqrt{P(x|E)} \ket{x}$ can be prepared using an expected number of queries to $O_E$ that is in $O(\sqrt{\Gamma_E/\langle P(x), P(E|x)\rangle})$.\label{lem:rejection}
 \end{lemma}
 \begin{proof}
 Using a single call to $O_E$ and adding a sufficient number of ancilla qubits, we can transform the state $\sum_x \sqrt{P(x)} \ket{x}$ into
@@ -227,7 +227,7 @@ Next the right most qubit register is measured and if a result of $1$ is obtaine
 \end{equation}
 which gives a probability distribution that corresponds to that expected by Bayes' rule.  The probability of this occurring is $\sum_x P(x) P(E|x) /\Gamma_E = \langle P(x), P(E|x) \rangle / \Gamma_E$.
 
-Since the process is heralded, amplitude amplification can be used to boost the probability of success for the successful branch quadratically~\cite{BHM+02}.  Thus the average number of queries is in $O(\sqrt{\Gamma_E/\langle P(x), P(E|x)\rangle})$ as claimed.
+Since the process is heralded and the initial state preparation process is unitary, amplitude amplification can be used to reduce the expected number of calls to the oracles quadratically~\cite{BHM+02}.  Thus the average number of queries is in $O(\sqrt{\Gamma_E/\langle P(x), P(E|x)\rangle})$ as claimed.
 \end{proof}
 
 If the Bayesian algorithm is used solely to post--process information then one update will suffice to give the posterior distribution.  In online settings many updates will be needed to reach the final posterior distribution.  If $L$ updates are required then the probability of all such updates succeeding given a sequence of observed variables $E_1,\ldots,E_L$ is at most
@@ -236,7 +236,7 @@ P_{\rm succ} \le \sum_x P(x) \left(\max_E \frac{P(E|x)}{\Gamma_E}\right)^L\le \s
 \end{equation}
 This shows that the probability of success generically will shrink exponentially with $L$.
 
-The exponential decay of the success probability with $L$ can be mitigated to some extent through amplitude amplification on the condition that all $L$ updates are successful  This reduces the expected number of updates needed to 
+The exponential decay of the success probability with $L$ can be mitigated to some extent by applying amplitude amplification on the outcome that all measurements are successful. This reduces the expected number of updates needed to 
 \begin{equation}
 O\left(\left({\sum_x P(x) \left(\min_E \frac{P(E|x)}{\Gamma_E}\right)^L}\right)^{-1/2}\right),
 \end{equation}
@@ -278,11 +278,11 @@ The validity of this algorithm is easy to verify from~\eq{Bayes} and it is clear
 
 This reduction of Grover's problem to Bayesian inference brings with it tight lower bounds on the query complexity of solving the problem~\cite{BGH+96}.  We can exploit these bounds to show limitations on quantum systems ability to perform Bayesian inference and correct erroneous measurements that occur in the application of the method of~\lem{rejection}.  The following theorem states two such restrictions, which show that the method of~\lem{rejection} cannot be trivially improved nor can its failures be inexpensively corrected. 
 \begin{theorem}
-Let $F$ be a blackbox quantum update algorithm that performs a quantum Bayesian update on an arbitrary pure state $\sum_{x=1}^N \alpha_x \ket{x}$ using $O(1)$ queries to the oracle $O_E$ and is heralded and has success probability $\Omega({\sum_x |\alpha_x|^2 P(E|x)/\Gamma_E})$ for $\max_x P(E|x)\le \Gamma_E\le 1$.  The following are impossible.
+Let $F$ be a blackbox quantum update algorithm that performs a quantum Bayesian update on $U\ket{0}=\sum_{x=1}^N \alpha_x \ket{x}$ for a known unitary operator $U$ using $O(1)$ queries to the oracle $O_E$ and is heralded and has success probability $\Omega({\sum_x |\alpha_x|^2 P(E|x)/\Gamma_E})$ for $\max_x P(E|x)\le \Gamma_E\le 1$.  The following are impossible.
 \begin{enumerate}
-\item A blackbox algorithm $G$ capable of performing a quantum Bayesian update of an arbitrary pure quantum state of the form $\sum_{x=1}^N \alpha_x \ket{x}$ that uses $O(1)$ queries to $O_E$ that is heralded and has  success probability $\omega({\sum_x |\alpha_x|^2 P(E|x)/\Gamma_E})$.
+\item A blackbox algorithm $G$ capable of performing a quantum Bayesian update and given a unitary operator $U:\ket{0}\mapsto\sum_{x=1}^N \alpha_x \ket{x}$ that uses $O(1)$ queries to $O_E$ that is heralded and has  success probability $\omega({\sum_x |\alpha_x|^2 P(E|x)/\Gamma_E})$.
 \item A blackbox algorithm $H$ that requires $o(\sqrt{N}/\log(N))$ queries to $O_E$ to undo the effects that $F$ applies to the arbitrary state $\sum_{x=1}^N \alpha_x \ket{x}$ upon a failed update.
-\item A blackbox algorithm $I$ capable of performing a quantum Bayesian update of an arbitrary pure quantum state of the form $\sum_{x=1}^N \alpha_x \ket{x}$ that, for all $O_E$, uses on average $o(\sqrt{N})$ queries to $O_E$.
+\item A blackbox algorithm $I$ capable of performing a quantum Bayesian update of $U\ket{0}=\sum_{x=1}^N \alpha_x \ket{x}$ that, for all $O_E$, uses on average $o(\sqrt{N})$ queries to $O_E$.
 \end{enumerate}
 \end{theorem}
 \begin{proof}
@@ -370,7 +370,7 @@ Approximations are therefore often needed to make both classical as well as quan
 
 We attack the problem by making our quantum algorithm a little more classical, meaning that through out the learning process we aim to learn an approximate classical model for the posterior alongside the quantum algorithm.  This classical model allowsus to approximately re--prepare the state should an update fail throughout the updating process.  This removes the exponential scaling, but results in an approximate inference.  We refer to this procedure as \emph{quantum resampling} as it is reminiscent of resampling in sequential Monte--Carlo algorithms or other particle filter methods such as assumed-density filtering~\cite{minka2001expectation}.  In order to prepare the distribution,
 we model the posterior distribution as a Gaussian distribution with mean and covariance equal to that of the true posterior.  This choice is sensible because once the Gaussian distribution is specified, the Grover--Rudolph state preparation method~\cite{GR02} can be used to prepare such states as their cumulative distribution functions can be efficiently computed.
-Alternatively, for one--dimensional problems, such states could be manufactured by approximate cloning.
+Alternatively, for one--dimensional problems, such states could be manufactured by approximate cloning~\cite{scarani2005quantum}.
 
 We are now equipped to define a semi-classical Bayesian update.
 \begin{definition}
@@ -382,7 +382,7 @@ Semi--classical Bayesian updating will be discussed in more detail in the follow
 
 %The first assumption that we make is that the prior distribution is a Gaussian.  This assumption is useful for two reasons.  Firstly, the prior distribution is completely specified via its mean and covariance matrix.  Secondly, in practice, non--degenerate learning problems tend to lead to posterior distributions that approach a Gaussian distribution about the true model parameters.  This is significant because it shows that, for a wide class of physically reasonable models for the posterior, the resultant state can be learned efficiently and cloned.  This is significant because it means that if a failure occurs then the prior can be efficiently re-prepared using the Grover--Rudolph state preparation method and the update can be attempted again.
 
-We need a means to measure the expectation values and components of the covariance matrix of the posterior for this method to work.  We provide such a method, based on the Hadamard test,  below.
+We need a means to measure the expectation values and components of the covariance matrix of the posterior for this method to work.  We provide such a method, based on the Hadamard test~\cite{aharonov2006polynomial},  below.
 
 \begin{lemma}
 Given a unitary operator $U\in \mathbb{C}^{N\times N}$ such that $U\ket{0}=\ket{\psi}:=\sum_x \sqrt{P(x)} \ket{x}$, an observable $\Lambda=\sum_x \lambda_x \ketbra{x}{x}$ and an estimate $\lambda_0:\max_x|\lambda_x-\lambda_0|\le \Delta\lambda$, there exists a quantum algorithm to estimate $(\bra{\psi} \Lambda\ket{\psi} -\lambda_0)$ within error $\epsilon$ with probability at least $8/\pi^2$ using $ O(\Delta\lambda/\epsilon)$ applications of $U$ and queries to an oracle $O_\lambda$ such that $O_\lambda\ket{x}\ket{0}= \ket{x}\ket{\lambda_x}$.\label{lem:ampest}
@@ -414,7 +414,7 @@ This probability can also be learned using the amplitude estimation algorithm.  
 We now turn our attention to estimating the mean and covariance of the posterior distribution that arises from quantum updating.  This is not quite a trivial application of~\lem{ampest} because our method for performing the update is non-unitary, which violates the assumptions of the Lemma.  We avoid this problem by instead estimating these moments in a two--step probability estimation process.  This approach is described in the following corollary.
 
 \begin{corollary}
-Assume that $\lambda_0$ is a vector containing each $\langle x_i\rangle$ and each $\langle x_i x_j \rangle$ evaluated over the prior and $\Delta \lambda \ge \max_k |\bra{P(x|E)} \Lambda_k \ket{P(x|E)}-\lambda_{0,k}|$ where $\Lambda_k$ is the operator corresponding to $x_i$ or $x_ix_j$  depending on the index $k$.  The mean and covariance matrix can be computed within error $\epsilon$ in the max--norm using $\tilde{O}\left(\frac{D^2\Delta \lambda \Gamma_E}{\epsilon \langle P(x), P(E|x)\rangle}\right)$ queries to $O_E$.\label{cor:method}
+Assume that $\lambda_0$ is a vector containing each $\langle x_i\rangle$ and each $\langle x_i x_j \rangle$ evaluated over the posterior $P(x|E)$.  Further, let $P(x|E) = \sum_{x} \sqrt{P(x|E)} \ket{x}$ and $\Delta \lambda \ge \max_k |\bra{P(x|E)} \Lambda_k \ket{P(x|E)}-\lambda_{0,k}|$ where $\Lambda_k$ is the operator corresponding to $x_i$ or $x_ix_j$  depending on the index $k$.  The mean and covariance matrix can be computed, with high-probability, within error $\epsilon$ in the max--norm using $\tilde{O}\left(\frac{D^2\Delta \lambda \Gamma_E}{\epsilon \langle P(x), P(E|x)\rangle}\right)$ queries to $O_E$.  Here $f(x)\in \tilde{O}(g(x))$ if there exists a constant $\alpha>0$ such that $\lim_{x\rightarrow \infty} f(x)/(\log^\alpha(x) g(x)) =0$. \label{cor:method}
 \end{corollary}
 \begin{proof}
 Our method works by classicially looping over all the components of the $\lambda_0$ vector, which we denote $\lambda_{0,k}$.
@@ -426,7 +426,7 @@ where $\lambda_x^{(k)}$ is of the form $x_i$ or $x_ix_j$ depending on the value 
 
 We cannot directly apply the previous lemma to learn the requisite values because the method for preparing the posterior probability distribution is non--unitary.
 We address this by breaking the parameter estimation process into two steps, each of which involves learning a separate probability that we call $P(1)$ and $P(11)$.
-Let $P(1)= \sum_x P(x) P(E|x)/\Gamma_E$ be the probability of performing the quantum Bayesian update.  Let $P(11)$ be the probability of both performing the update and measuring the right most qubit in~\eq{hadtest} to be $1$.  This probability is
+Let $P(1)= \sum_x P(x) P(E|x)/\Gamma_E$ be the probability of performing the quantum Bayesian update.  Let $P(11)$ be the probability of both performing the update and measuring the right most qubit in~\eq{hadtest} to be $1$.  Both will be learned using amplitude estimation, which is possible because the initial state is prepared using a unitary process.  This probability is
 \begin{equation}
 P(11) = \frac{P(1)}{2}\left(1+\frac{\langle \Lambda_k \rangle -\lambda_{0,k}}{\Delta \lambda} \right),
 \end{equation}
@@ -435,10 +435,11 @@ Therefore $\langle \Lambda_k \rangle$ can be computed from $P(11)$ and $P(1)$ vi
 \begin{equation}
 \langle \Lambda_k \rangle = \left(2\frac{P(11)}{P(1)}-1 \right)\Delta \lambda + \lambda_{0,k},
 \end{equation}
-If we estimate $P(1)$ and $P(11)$ within error $O(\delta)$ then the error in $\langle \Lambda_k \rangle$ is from calculus $O(\delta/P(1))$ since $P(1)\ge P(11)$.  Therefore $\langle \Lambda_k \rangle$ can be estimated to within error $\epsilon$ if $\delta \in O(\epsilon P(1) /\Delta \lambda)$.  Bounds on the cost of amplitude estimation give the cost of this to be~\cite{BHM+02}
+If we estimate $P(1)$ and $P(11)$ within error $O(\delta)$ then the error in $\langle \Lambda_k \rangle$ is from calculus $O(\delta\Delta \lambda/P(1))$ since $P(1)\ge P(11)$.  Therefore $\langle \Lambda_k \rangle$ can be estimated to within error $\epsilon$ if $\delta \in O(\epsilon P(1) /\Delta \lambda)$.  Bounds on the cost of amplitude estimation give the cost of this to be~\cite{BHM+02}
 \begin{equation}
 \tilde{O} \left(\frac{\Gamma_E \Delta \lambda}{\epsilon \sum_x P(x) P(E|x)} \right).
 \end{equation}
+Here the $\tilde{O}(\cdot)$ is used to remove log-factors that arise from use of the Chernoff bound to boost the probability of success to near-unity.
 The result then follows from noting that there are $O(D^2)$ different values of $k$ that need to be computed to learn the expectation values needed to compute the components of the posterior mean and covariance matrix.
 \end{proof}
 This shows that if we require modest relative error (i.e. $\Delta \lambda \in O(\epsilon)$) and $\Gamma_E$ is reasonably tight then this process is highly efficient.  In contrast, previous results that do not use these factors that incorporate apriori knowledge of the scale of these terms may not be efficient under such assumptions.
@@ -459,12 +460,12 @@ The algorithm is simple.
 \item Return these quantities, which give a parameterization of the approximation to the posterior distribution.
 \end{enumerate}
 
-After step 1, we have from the independence of the successes that the probability of all $L$ updates succeeding is $\sum_x P(x) \prod_{k=1}^L P(E_k|x)/\Gamma_{E_k}$.  Thus step 2 can be performed using $\tilde{O}\left(\frac{D^2\Delta \lambda}{\epsilon \langle w, \prod_k P(E_k|x)/\Gamma_{E_k}\rangle}\right)$ preparations of the posterior state from~\cor{method}.  Since each such preparation requires $L$ queries to $O_E$ the total query complexity required to learn the posterior mean and variance is
+After step 1, we have from the independence of the successes that the probability of all $L$ updates succeeding is $\sum_x P(x) \prod_{k=1}^L P(E_k|x)/\Gamma_{E_k}$.  Thus step 2 can be performed using $\tilde{O}\left(\frac{D^2\Delta \lambda}{\epsilon \langle P(x), \prod_k P(E_k|x)/\Gamma_{E_k}\rangle}\right)$ preparations of the posterior state from~\cor{method}.  Since each such preparation requires $L$ queries to $O_E$ the total query complexity required to learn the posterior mean and variance is
 \begin{equation}
 \tilde{O} \left(\frac{LD^2 \Delta \lambda }{\epsilon \langle  P(x), \prod_{k=1}^LP(E_k|x)/\Gamma_{E_k}\rangle} \right)
 \end{equation}
 
-Finally, since the algorithm outputs the mean and covariance matrix of the posterior distribution, it outputs a function $F(x;\mu,\sigma)$ that captures (to within error $\epsilon$) the first two moments of the posterior distribution.  Thus the algorithm clearly performs a semi--classical update as per~\defn{semi}.
+Finally, since the algorithm outputs the mean and covariance matrix of the posterior distribution, it yields the parameterization of a function $f\in F(x;\mu,\sigma)$ that captures (to within error $\epsilon$) the first two moments of the posterior distribution.  Thus the algorithm clearly performs a semi--classical update as per~\defn{semi}.
 \end{proof}
 
 The complexity of the above approximate quantum inference algorithm cannot be easily compared to that of exact Bayesian inference because both algorithms
@@ -500,6 +501,7 @@ a=\sin^2\left(\frac{\sin^{-1}(\sqrt{y})}{2m+1}\right) + O\left(\frac{\delta}{m^2
 \end{equation}
 Since $a<1$ the error is $O(\delta/m^2)$.  Hence if we desire error $\epsilon$ in $a$ then it suffices to take $\delta\in O(\epsilon m^2)$.  Thus $\tilde O(1/\epsilon m)$ applications of $S$ are needed to infer $a$ to within error $\epsilon$.
 
+
 Although this may seem to suggest that taking large $m$ always leads to a better inference of $a$, this is not necessarily true for this inversion process.  This is because if 
 \begin{equation}
 m > \frac{1}{2}\left(\frac{\pi}{2\sin^{-1}(\sqrt{a})}-1\right)\label{eq:mvalid}
@@ -510,171 +512,17 @@ m > \frac{1}{2}\left(\frac{\pi}{2\sin^{-1}(\sqrt{a})}-1\right)\label{eq:mvalid}
 as claimed.
 \end{proof}
 
+This lemma is significant because it shows that if the scale of a probability that you wish to estimate is known then you can use amplitude amplification to boost the probability of success to $O(1)$ prior to estimating the probability.  This can lead to a quadratic reduction in the cost of estimation if a constant number of bits of significance are required.
+
 As an additional note, this method described in this section is not limited to tracking the values of static latent variables.  If the latent variable has itself explicit time dependence then the above approach can
-be modified to robustly track its variation in time.  This is discussed in more detail in~\app{time-dep}.
+be modified to robustly track its variation in time.  This is discussed in more detail in~\app{time-dep}.  We further discuss how to use quantum computing to find approximately optimal experiments to perform based on the current prior in~\app{adaptive}.
 
 
-\section{Adaptive experiment design}
-
-In science and engineering, inference problems frequently involve decision variables that can
-be set in order to optimize the performance of the algorithm.  For example, in the phase estimation 
-algorithm such a decision variable may be the amount of time that the system is allowed to 
-evolve for.  Finding locally optimal parameters for inference can be computationally challenging
-(especially for online learning problems). Here, we show that our algorithm allows for quantum
-computing to be used to perform Bayesian experiment design with significant
-advantages over classical methods.
-
-In practice, Bayesian experiment design is often posed in terms of finding
-experiments which maximize a \emph{utility function} such as the information
-gain or the reduction in a loss function. Once a utility function is
-chosen, the argmax can be found by gradient ascent methods provided that the
-derivatives of the utility can be efficiently computed. In particular, since
-the reduction in the \emph{quadratic loss} is given by the posterior variance,
-our algorithm allows for computing gradients of the corresponding utility
-function.
-
-% Quantum computing can also be used to find the best experiment to perform given the current knowledge of the system.  The way this is usually done in practice is to compute the argmax of the utility function, which measures the expected value of a given experiment. This can be estimated using a gradient ascent algorithm given the gradient of the utility function.  In order to rigorously define the utility we need to define two quantities: the Bayes risk and the loss function.  For simplicity, we assume that all model parameters are re--normalized such that $x\in[0,1]$.
-
-Formally, we need to define two quantities: the loss function and the Bayes
-risk. In doing so, we will assume without loss of generality that the model
-parameters are renormalized such that all components of $x$ lie in $[0, 1]$.
-The loss function represents a penalty assigned to errors in the in our
-estimates of $x$. We consider here the multiparameter generalization of the
-mean-squared error, the quadratic loss. For an estimate $\hat{x}$,
-\begin{equation}
-    \mathcal{L}(x, \hat{x}) = \left(x - \hat{x}\right)^\TT \left(x - \hat{x}\right).
-\end{equation}
-Letting $\hat{x}$ be the Bayesian mean estimator for the posterior $P(x | d, c)$
-and considering the single-parameter case,
-\begin{equation}
-    \mathcal{L}(x, P(x|d,c)) = \left(x-\int P(x'|d,c) x' \mathrm{d}x'\right)^2.
-\end{equation}
-Having defined the loss function, the risk is the expectation of the loss over
-experimental data, $\expect{\mathcal{L}(x, \hat{x})}{d}$, where $\hat{x}$ is
-taken to depend on the experimental data. The Bayes risk is then the
-expectation of risk over both the prior distribution and the outcomes,
-\begin{gather}
-    \begin{aligned}
-        \mathcal{R}(x, P(x)) & = \expect{\mathcal{L}(x, P(x | d, c))}{d, x \sim P(x)} \\
-                             & = \int P(x)\int P(d|x,c) \left(x-\int P(x'|d,c) x' \mathrm{d}x'\right)^2 \mathrm{d}x\mathrm{d}d.
-    \end{aligned}
-\end{gather}
-The Bayes risk for the quadratic loss function is thus the trace of the posterior covariance matrix,
-averaged over possible experimental outcomes.
-We want to find $c$ that minimizes the Bayes risk, so that a reasonable utility function to optimize for is the negative posterior variance,
-\begin{equation}
-    \label{eq:utility}
-    \mathcal{U}(P(x),c) = -\int P(x)\int P(d|x,c) \left(x-\int P(x'|d,c) x' \mathrm{d}x'\right)^2 \mathrm{d}x\mathrm{d}d.
-\end{equation}
-
-The application of our algorithm is now made clear: like classical particle
-filtering methods, our algorithm can estimate expectation values over
-posterior distributions efficiently. Thus, $\mathcal{U}$ can be calculated using quantum resources,
-including in cases where classical methods alone fail.
-In the finite dimensional setting that we're interested in we simply replace these integrals by sums over the corresponding variables.
-The derivatives of $\mathcal{U}$ can then be approximated for small but finite $h$ as 
-\begin{equation}
-\frac{\partial \mathcal{U}(P(x),c)}{\partial c_j} = \frac{\mathcal{U}(P(x),c+h\hat{c_j})-\mathcal{U}(P(x),c)}{h} + O(h^2).
-\end{equation}
-Thus if $c$ consists of $C$ different components then $O(C)$ calculations of the utility function are needed to estimate the gradient for a finite value of $h$.
-This is the intuition behind our method, the performance of which is given in the following theorem.
-\begin{theorem}
-Assume that the prior distribution $P(x)$ has support only on the interval $x\in [0,1]$ and that the observable varible $E$ has support only on $D$ distinct values; then each component of the gradient of $\mathcal{U}$ can be computed within error $\epsilon$ using on average $\tilde{O}\left(D\sqrt{\max_{c,j}\left|\frac{\partial^3 U(c)}{\partial c_j^3} \right|}/\epsilon^{3/2}\right)$ queries to the likelihood function and the prior, for $\epsilon \le \min_d \int P(d|x)P(x) \mathrm{d}x/2$.
-\end{theorem}
-\begin{proof}
-The utility function can be directly computed on a quantum computer, but doing
-so is challenging because of the need to coherently store the posterior means
-of the distribution.  We simplify this by expanding the square in~\eq{utility}
-to find
-\begin{align}
-\mathcal{U}(P(x),c) = &-\iint P(x) P(d|x,c) x^2 \mathrm{d}x\mathrm{d}d\nonumber\\
-&+2\iiint P(x) P(d|x,c) P(x'|d,c) xx' \mathrm{d}x' \mathrm{d}d\mathrm{d}x\nonumber\\
-&-\iiiint P(x) P(d|x,c) P(x'|d,c)P(x''|d,c) x'x'' \mathrm{d}x''\mathrm{d}x' \mathrm{d}d\mathrm{d}x.\label{eq:multiutility}
-\end{align}
-We then compute each of these terms individually and combine the results classically to obtain an estimate of $\mathcal{U}$.
-
-The double integral term in~\eq{multiutility} is the easiest to compute.  It can be computed by preparing the state
-\begin{equation}
-\sum_x \sqrt{P(x)} \ket{x} \frac{1}{\sqrt{D}}\sum_{d=1}^D \ket{d}\left(\sqrt{{P(D|x,c)x^2}}\ket{1} + \sqrt{1 -P(D|x,c)x^2}\ket{0} \right). 
-\end{equation}
-The probability of measuring the right most qubit to be $1$ is $$\sum_x\sum_d P(x)P(D|x,c)x^2/D \le 1/D.$$  Therefore the desired probability can be found by estimating the likelihood of observing $1$ divided by the total number of outcomes $D$.  A direct application of amplitude estimation gives that the expectation value can be learned within error $\epsilon$ using $\tilde{O}(D/\epsilon)$ preparations of the initial state and evaluations of the likelihood function.  
-
-Since the probability of success is known to be bounded above by $1/D$, \thm{priorAmpEst} implies that $\tilde{O}(\sqrt{D}/\epsilon_0)$ state preparations are needed to estimate the integral if we define $S$ to be a reflection operator that imparts a phase if and only if the ancilla qubit equals $1$.
-
-
-The numerator can be estimated in exactly the same fashion, by preparing the state
-\begin{equation}
-\sum_x \sqrt{P(x)} \ket{x}\sum_{x'} \sqrt{P(x')} \ket{x'} \left(\sqrt{P(d|x',c){P(d|x,c)}xx'}\ket{1} + \sqrt{1 -P(d|x',c)P(d|x,c)xx'}\ket{0} \right),
-\end{equation}
-Note that the numerator, $N(d|c)$, is not $\Theta(1)$: it is in fact $O(P^2(d))$ as seen by the Cauchy--Schwarz inequality and $x\in [0,1]$
-\begin{equation}
-\sum_x \sum_{x'} P(x) P(x') P(d|x,c) P(d|x',c) x x' \le \left(\sum_x P(x) P(d|x,c)\right)^2=P_d^2.
-\end{equation}
-
-The triple integral in~\eq{multiutility} is much more challenging.  It can be expressed as
-\begin{equation}
-\iiint P(x) P(d|x,c) P(x'|d,c) xx' \mathrm{d}x' \mathrm{d}d\mathrm{d}x\nonumber = \iiint P(x) P(d|x,c) \frac{P(d|x',c)P(x')}{\int P(d|x',c) P(x')\mathrm{d}x'} xx' \mathrm{d}x' \mathrm{d}d\mathrm{d}x.
-\end{equation}
-The integral over $d$ in this expression is difficult to compute in superposition.  So instead, we forgo directly integrating over $d$ using the quantum computer and instead compute the integrand quantumly and classically integrate over $d$.  In many models $D$ will be small ($D=2$ is not uncommon) hence a polynomial reduction in the scaling with $D$ will often not warrant the additional costs of amplitude amplification.
-
-For fixed $d$, the first step is to compute $P(d):=\int P(d|x,c) P(x)\mathrm{d}x$, which can be estimated by preparing the state
-\begin{equation}
-\sum_x \sqrt{P(x)} \ket{x} \left(\sqrt{{P(d|x,c)}}\ket{1} + \sqrt{1 -P(d|x,c)}\ket{0} \right),\label{eq:update1}
-\end{equation}
-and estimating, $P(d)$, the probability that the right--most qubit is $1$, which is the required probability.   This can be learned within error $\epsilon$ using amplitude estimation, which requires $\tilde{O}(1/\epsilon)$ queries to the initial state and the likelihood oracle~\cite{BHT+00}.
-
-
-For simplicity let us define the integral to be $N(d|c)/P(d)$ and the approximation to the integral as $\tilde{N}(D|c)/\tilde{P}(d)$.  We then see from the triangle inequality that if we estimate the denominator to within error $\epsilon_0\le P(d)/2$ then
-\begin{align}
-\left|\frac{\tilde{N}(d|c)}{\tilde{P}(d)} -\frac{{N}(d|c)}{{P}(d)}\right|&\le \left|\frac{\tilde{N}(d|c)}{\tilde{P}(d)} -\frac{{N}(d|c)}{\tilde {P}(d)}\right|+\left|\frac{{N}(d|c)}{\tilde{P}(d)} -\frac{{N}(d|c)}{{P}(d)}\right|.\nonumber\\
-&\le \frac{1}{P(d)-\epsilon_0}\left|{\tilde{N}(d|c)} -{{N}(d|c)}{}\right|+P(d)^2\left|\frac{1}{\tilde{P}(d)} -\frac{1}{{P}(d)}\right|\nonumber\\
-&\le \frac{2}{P(d)}\left|{\tilde{N}(d|c)} -{{N}(d|c)}{}\right|+P(d)\left|\frac{1}{1-\epsilon_0/P(d)} -1\right|\nonumber\\
-&\le \frac{2}{P(d)}\left|{\tilde{N}(d|c)} -{{N}(d|c)}{}\right|+\epsilon_0.\label{eq:2IntegralTerms}
-\end{align}
-Therefore under these assumptions it is necessary to estimate $N(d|c)$ to within error $O(\epsilon_0/P(d))$ to achieve error $O(\epsilon_0)$.
-We can accelerate this inference process by observing that 
-\begin{equation}
-N(d|c)\le (P(d)+\epsilon_0)^2\in O(P^2(d)),
-\end{equation}
-since $\epsilon_0 \le P(d)/2$.  \thm{priorAmpEst} can then be used to estimate $N(d|c)$ within error $\delta$ using $\tilde O(P(d)/\delta)$ queries.  Since we need error $\epsilon_0P(d)$ the number of query operations needed to infer $N(d|c)$ within error $\epsilon_0$ is in $\tilde O(1/\epsilon_0)$.  This process needs to be repeated classically $D$ times so the total cost is $\tilde O(D/\epsilon_0)$ for this step as well.  Thus we see from~\eq{2IntegralTerms} that the total error can be made less than $\epsilon_0$, with high probability, using a number of queries that scales as $\tilde{O}(D/\epsilon)$.
-
-
-
-%Therefore, if we use amplitude amplification to boost the upper bound on the probability to $1$ and then use amplitude estimation to learn the amplified %probability, the average number of queries needed to learn this quantity within the desired accuracy is $\tilde{O}(1/\epsilon)$.  The classical integration loop %requires that we repeat this process $D$ times, and so the resultant complexity is $\tilde O(D/\epsilon)$.
-
-The analysis of the quadrouple integral is exactly the same and requires $\tilde O(D/\epsilon)$ queries on average.  Thus the cost of evaluating the utility function to within error $\epsilon$ with high probability is $\tilde O(D/\epsilon)$.  
-
-Given an algorithm that can compute $U(c)$ using a number of queries that scales as $\tilde{O}(D/\epsilon)$, we can estimate the derivative using a centered difference formula.  In particular we know that
-
-\begin{equation}
-\left|\frac{\partial U(c)}{\partial c_j}-\frac{U(c+\delta_j)-U(c-\delta_j)}{2\delta} \right|\le \max_{c,j} \left|\frac{\partial^3 U(c)}{\partial c_j^3} \right|\frac{\delta^2}{6},
-\end{equation}
-where $|\delta_j|=\delta$ and $\delta_j$ is a vector parallel to the unit vector $c_j$.
-Since we cannot compute $U(c\pm\delta_j)$ exactly, the error we want to bound is
-\begin{align}
-&\left|\frac{\partial U(c)}{\partial c_j}-\frac{\tilde U(c+\delta_j)-\tilde U(c-\delta_j)}{2\delta} \right|\nonumber \\
-&\qquad \le \left|\frac{\partial U(c)}{\partial c_j}-\frac{ U(c+\delta_j)- U(c-\delta_j)}{2\delta} \right|+\left|\frac{ U(c+\delta_j)- U(c-\delta_j)}{2\delta}-\frac{ \tilde U(c+\delta_j)- \tilde U(c-\delta_j)}{2\delta} \right|,
-\end{align}
-where $\tilde U$ is the approximation to the utility function that has error at most $\epsilon_0$.  The error is then
-\begin{equation}
-O\left(\max_{c,j} \left|\frac{\partial^3 U(c)}{\partial c_j^3} \right|{\delta^2}+\frac{\epsilon_0}{\delta}\right).
-\end{equation}
-Since $\delta$ is a free parameter that we will choose to make both sources of error equivalent.  This corresponds to $\delta= \epsilon_0^{1/3}/\max_{c,j} \left|\frac{\partial^3 U(c)}{\partial c_j^3} \right|^{1/3}$.  This gives an overall error of
-\begin{equation}
-O\left({\epsilon_0^{2/3}}{\max_{c,j}\left|\frac{\partial^3 U(c)}{\partial c_j^3} \right|^{1/3}} \right).
-\end{equation}
-If we wish to make this error $\epsilon$ then it suffices to take $\epsilon_0 = \epsilon^{3/2}/\sqrt{\max_{c,j}\left|\frac{\partial^3 U(c)}{\partial c_j^3} \right|}$.  Since the cost of computing $U(c\pm \delta_j)$ within error $\epsilon_0$ with high probability is $\tilde O(D/\epsilon_0)$ the cost estimates follow.
-\end{proof}
-
-This shows that we can use quantum techniques to achieve a polynomial speedup over classical methods for computing the gradient using sampling, which would require $O(D/\epsilon_0^2)$ queries.  It is also worth noting that high--order methods for estimating the gradient may be useful for further improving the error scaling.
-
-Another interesting feature of this approach is that we do not explicitly use the qubit string representation for the likelihood to prepare states such as~\eq{update1}.   Similar states could therefore also be prepared for problems such as quantum Hamiltonian learning~\cite{WGF+14} by eschewing a digital oracle and instead using a quantum simulation circuit that marks parts of the quantum state that correspond to measurement outcome $d$ being observed.  This means that these algorithms can be used in concert with quantum Hamiltonian learning ideas to efficiently optimize experimental design, whereas no efficient classical method exists to do so because of the expense of simulation.
-
-\section{Quantum Bayesian updating using repetition codes}
+\section{Quantum Bayesian updating using redundancy}
 While we have addressed a semi--classical form of learning for quantum Bayesian inference, an interesting remaining question is whether the form of quantum
-Bayesian inference that we consider has a well defined classical limit.  The hope would be that such a protocol would also be an approximate Bayesian method, but would not be susceptible to the probabilistic failures that plague the quantum approach.  We can reach such a limit by using a repetition code to perform a protocol that is similar to semi--classical updating, but does not involve storing classical information.  We also focus on the one-dimensional case in the following, but generalization to the multi-dimensional case is straightforward.
+Bayesian inference that we consider has a well defined classical limit.  The hope would be that such a protocol would also be an approximate Bayesian method, but would not be susceptible to the probabilistic failures that plague the quantum approach.  We can reach such a limit by using redundant copies of the state to perform a protocol that is similar to semi--classical updating, but does not involve storing classical information.  We also focus on the one-dimensional case in the following, but generalization to the multi-dimensional case is straightforward.
 
-The repetition code that allows us to reach the classical limit of the quantum algorithm is trivial:
+The approach that allows us to reach the classical limit of the quantum algorithm is trivial:
 \begin{equation}
 \sum_{j} \sqrt{P(x_j)} \ket{x_j} \mapsto \ket{\psi}:= \left(\sum_j \sqrt{P(x_j)} \ket{x_j}\right)^{\otimes K}.
 \end{equation}
@@ -709,14 +557,14 @@ If $K$ is sufficiently large, then any branches that fail can be immediately rep
 
 This shows that a redundant encoding can be used in order to protect the low--order moments against the effects of measurement.  Therefore means that even if some updates fail then these results can be erased and replaced with a Gaussian approximation to the posterior distribution (for example).  An explicit classical register is not needed in this approach, although since the entanglement of the expectation value register with the remaining qubits approaches zero.  In this sense, it becomes a classical register and this result can also be thought of as an examination of the classical limit of quantum Bayesian updating.
 
-While this shows that repetition codes can allow the algorithm to proceed without classical memory, it makes substantial demands on the memory.  For even modest problems, it is likely to require thousands of copies of the state in order to be able to resist the effects of measurement back action on the state.  This shows that while error correction can allow quantum systems able to learn efficiently without classical memory, the resulting systems will seldom be small.  This suggests that there may be a tradeoff between system size and robustness that may make learning in small quantum systems highly challenging.
+While this shows that the algorithm can proceed without classical memory, it makes substantial demands on the memory.  For even modest problems, it is likely to require thousands of copies of the state in order to be able to resist the effects of measurement back action on the state.  This shows that while error correction can allow quantum systems able to learn efficiently without classical memory, the resulting systems will seldom be small.  This suggests that there may be a tradeoff between system size and robustness that may make learning in small quantum systems highly challenging.
 
 \section{Conclusion}
 Our main contribution of this paper can be thought of as an analysis of the ability of small quantum systems' capacity to learn.  In it we have examined a class of quantum learning algorithms that require only logarithmic memory to update a register that stores its beliefs about a latent variable $x$ that it must infer from a set of observable variables $E$ that whose likelihoods are only known through access to a quantum oracle.  We show that such algorithms cannot in general be efficient and hence they cannot learn according to the definition of learning that we give.  However, we provide a semi--classical algorithm that uses classical memory to circumvent this problem within the context of approximate Bayesian inference.  Thus quantum systems can learn if augmented with classical memory, however the need for such memory precludes them from being small.
 
-Our semi--classical algorithm has a number of performance advantages over classical methods.  It also can leverage quantum superposition to provide quadratic advantages for experiment design and also can be used to track the motion of time--dependent latent variables.  We further demonstrate the need to store the model in classical memory is in principle superflous because a quantum repetition code can be used to robustly encode this information in the quantum state.  This suggests that while small quantum systems may not be able to efficiently learn (especially in an online setting), redundant information can be used to protect the knowledge gained by the quantum system against the potentially destructive impacts of the non--linear transformations required by Bayesian inference.  This supports the conjecture that error correction is intimately linked to  learning.  
+Our semi--classical algorithm has a number of performance advantages over classical methods.  It also can leverage quantum superposition to provide quadratic advantages for experiment design and also can be used to track the motion of time--dependent latent variables.  We further demonstrate the need to store the model in classical memory is in principle superflous because multiple copies of the prior state can be used to robustly encode this information in the quantum state.  This suggests that while small quantum systems may not be able to efficiently learn (especially in an online setting), redundant information can be used to protect the knowledge gained by the quantum system against the potentially destructive impacts of the non--linear transformations required by Bayesian inference.  This supports the conjecture that error correction is intimately linked to  learning.  
 
-Although our work suggests that small quantum systems may face substantial difficulties when trying to perform Bayesian inference in an oracular setting, much more work is needed in order to provide a complete answer to the question of whether small quantum systems can learn.  In particular, a more concrete definition of learning may be useful for deciphering when a small quantum learning agent is capable of \emph{usefully learning} from its surroundings.  Probing such questions may be essential for more than just developing new quantum machine learning algorithms, it may help us understand the fundamental limitations that quantum mechanics imposes on our ability to learn about the universe.
+Although our work suggests that small quantum systems may face substantial difficulties when trying to perform Bayesian inference in an oracular setting, much more work is needed in order to provide a complete answer to the question of whether small quantum systems can learn.  Further generalizations of our algorithms could be possible using fixed-point amplitude amplification~\cite{yoder2014fixed}, which could help make the update process unitary.  Perhaps more evocatively, a more concrete definition of learning may be useful for deciphering when a small quantum learning agent is capable of \emph{usefully learning} from its surroundings.  Probing such questions may be essential for more than just developing new quantum machine learning algorithms, it may help us understand the fundamental limitations that quantum mechanics imposes on our ability to learn about the universe.
 
 \begin{acknowledgments}
 We would like to thank J. Combes and J. Yard for valuable feedback and discussion as well as J. Emerson for suggesting the idea of quantum learning agents.
@@ -964,5 +812,169 @@ If $1$ is measured then the result will implement the circular convolution $P \s
 
 First, the query complexity of this algorithm is easy to estimate.  The initial state preparation requires a query to $O_{\rm in}$ and the calculation of $\hat{Q}(k)$ requires a query to $P_{\hat{Q}}$.  By using amplitude amplification on the $1$ result, we have that on average $O(\sqrt{\Gamma_E/ \langle \mathcal{F}(P), \mathcal{F}(Q)}\rangle)$ queries are required to prepare the state.
 \end{proof}
+
+
+
+\section{Adaptive experiment design}\label{app:adaptive}
+
+In science and engineering, inference problems frequently involve decision variables that can
+be set in order to optimize the performance of the algorithm. 
+The basic idea behind designing an adaptive experiment is to choose, based on the current beliefs about a hypothesis,
+the most informative experiment based on these current beliefs.  A natural way to do this is to select a set of experiments and
+then, based on the prior distribution, simulate what the expected variance in the posterior distribution would be over these 
+experiments.  A natural choice of experiment to choose would then be the one that yields the smallest expected posterior variance.
+While this may provide an acceptable experiment, it is unlikely to yield a locally optimal (or approximately locally optimal) experiment.
+In order to do so we need to be able to perform a search algorithm on top of this to find the experiment that yields the smallest
+expected posterior variance.
+
+The problem is that approaches for finding locally optimal sets of parameters can be computationally expensive, even for gradient-free optimization.
+The reason is that many evaluations of the likelihood function are needed in the procedure, which limits its applicability in general.  Here we propose using
+quantum techniques to accelerate finding such locally optimal experiments within the context of Bayesian experiment design.
+
+In practice, Bayesian experiment design is often posed in terms of finding
+experiments which maximize a \emph{utility function} such as the information
+gain or the reduction in a loss function. Once a utility function is
+chosen, the argmax can be found by gradient ascent methods provided that the
+derivatives of the utility can be efficiently computed. In particular, since
+the reduction in the \emph{quadratic loss} is given by the posterior variance,
+our algorithm allows for computing gradients of the corresponding utility
+function.
+
+% Quantum computing can also be used to find the best experiment to perform given the current knowledge of the system.  The way this is usually done in practice is to compute the argmax of the utility function, which measures the expected value of a given experiment. This can be estimated using a gradient ascent algorithm given the gradient of the utility function.  In order to rigorously define the utility we need to define two quantities: the Bayes risk and the loss function.  For simplicity, we assume that all model parameters are re--normalized such that $x\in[0,1]$.
+
+Formally, we need to define two quantities: the loss function and the Bayes
+risk. In doing so, we will assume without loss of generality that the model
+parameters are renormalized such that all components of $x$ lie in $[0, 1]$.
+The loss function represents a penalty assigned to errors in the in our
+estimates of $x$. We consider here the multiparameter generalization of the
+mean-squared error, the quadratic loss. For an estimate $\hat{x}$,
+\begin{equation}
+    \mathcal{L}(x, \hat{x}) = \left(x - \hat{x}\right)^\TT \left(x - \hat{x}\right).
+\end{equation}
+Letting $\hat{x}$ be the Bayesian mean estimator for the posterior $P(x | d, c)$
+and considering the single-parameter case,
+\begin{equation}
+    \mathcal{L}(x, P(x|d,c)) = \left(x-\int P(x'|d,c) x' \mathrm{d}x'\right)^2.
+\end{equation}
+Having defined the loss function, the risk is the expectation of the loss over
+experimental data, $\expect{\mathcal{L}(x, \hat{x})}{d}$, where $\hat{x}$ is
+taken to depend on the experimental data. The Bayes risk is then the
+expectation of risk over both the prior distribution and the outcomes,
+\begin{gather}
+    \begin{aligned}
+        \mathcal{R}(x, P(x)) & = \expect{\mathcal{L}(x, P(x | d, c))}{d, x \sim P(x)} \\
+                             & = \int P(x)\int P(d|x,c) \left(x-\int P(x'|d,c) x' \mathrm{d}x'\right)^2 \mathrm{d}x\mathrm{d}d.
+    \end{aligned}
+\end{gather}
+The Bayes risk for the quadratic loss function is thus the trace of the posterior covariance matrix,
+averaged over possible experimental outcomes.
+We want to find $c$ that minimizes the Bayes risk, so that a reasonable utility function to optimize for is the negative posterior variance,
+\begin{equation}
+    \label{eq:utility}
+    \mathcal{U}(P(x),c) = -\int P(x)\int P(d|x,c) \left(x-\int P(x'|d,c) x' \mathrm{d}x'\right)^2 \mathrm{d}x\mathrm{d}d.
+\end{equation}
+
+The application of our algorithm is now made clear: like classical particle
+filtering methods, our algorithm can estimate expectation values over
+posterior distributions efficiently. Thus, $\mathcal{U}$ can be calculated using quantum resources,
+including in cases where classical methods alone fail.
+In the finite dimensional setting that we're interested in we simply replace these integrals by sums over the corresponding variables.
+The derivatives of $\mathcal{U}$ can then be approximated for small but finite $h$ as 
+\begin{equation}
+\frac{\partial \mathcal{U}(P(x),c)}{\partial c_j} = \frac{\mathcal{U}(P(x),c+h\hat{c_j})-\mathcal{U}(P(x),c)}{h} + O(h^2).
+\end{equation}
+Thus if $c$ consists of $C$ different components then $O(C)$ calculations of the utility function are needed to estimate the gradient for a finite value of $h$.
+This is the intuition behind our method, the performance of which is given in the following theorem.
+\begin{theorem}
+Assume that the prior distribution $P(x)$ has support only on the interval $x\in [0,1]$ and that the observable varible $E$ has support only on $D$ distinct values; then each component of the gradient of $\mathcal{U}$ can be computed within error $\epsilon$ using on average $\tilde{O}\left(D\sqrt{\max_{c,j}\left|\frac{\partial^3 U(c)}{\partial c_j^3} \right|}/\epsilon^{3/2}\right)$ queries to the likelihood function and the prior, for $\epsilon \le \min_d \int P(d|x)P(x) \mathrm{d}x/2$.
+\end{theorem}
+\begin{proof}
+The utility function can be directly computed on a quantum computer, but doing
+so is challenging because of the need to coherently store the posterior means
+of the distribution.  We simplify this by expanding the square in~\eq{utility}
+to find
+\begin{align}
+\mathcal{U}(P(x),c) = &-\iint P(x) P(d|x,c) x^2 \mathrm{d}x\mathrm{d}d\nonumber\\
+&+2\iiint P(x) P(d|x,c) P(x'|d,c) xx' \mathrm{d}x' \mathrm{d}d\mathrm{d}x\nonumber\\
+&-\iiiint P(x) P(d|x,c) P(x'|d,c)P(x''|d,c) x'x'' \mathrm{d}x''\mathrm{d}x' \mathrm{d}d\mathrm{d}x.\label{eq:multiutility}
+\end{align}
+We then compute each of these terms individually and combine the results classically to obtain an estimate of $\mathcal{U}$.
+
+The double integral term in~\eq{multiutility} is the easiest to compute.  It can be computed by preparing the state
+\begin{equation}
+\sum_x \sqrt{P(x)} \ket{x} \frac{1}{\sqrt{D}}\sum_{d=1}^D \ket{d}\left(\sqrt{{P(D|x,c)x^2}}\ket{1} + \sqrt{1 -P(D|x,c)x^2}\ket{0} \right). 
+\end{equation}
+The probability of measuring the right most qubit to be $1$ is $$\sum_x\sum_d P(x)P(D|x,c)x^2/D \le 1/D.$$  Therefore the desired probability can be found by estimating the likelihood of observing $1$ divided by the total number of outcomes $D$.  A direct application of amplitude estimation gives that the expectation value can be learned within error $\epsilon$ using $\tilde{O}(D/\epsilon)$ preparations of the initial state and evaluations of the likelihood function.  
+
+Since the probability of success is known to be bounded above by $1/D$, \thm{priorAmpEst} implies that $\tilde{O}(\sqrt{D}/\epsilon_0)$ state preparations are needed to estimate the integral if we define $S$ to be a reflection operator that imparts a phase if and only if the ancilla qubit equals $1$.
+
+
+The numerator can be estimated in exactly the same fashion, by preparing the state
+\begin{equation}
+\sum_x \sqrt{P(x)} \ket{x}\sum_{x'} \sqrt{P(x')} \ket{x'} \left(\sqrt{P(d|x',c){P(d|x,c)}xx'}\ket{1} + \sqrt{1 -P(d|x',c)P(d|x,c)xx'}\ket{0} \right),
+\end{equation}
+Note that the numerator, $N(d|c)$, is not $\Theta(1)$: it is in fact $O(P^2(d))$ as seen by the Cauchy--Schwarz inequality and $x\in [0,1]$
+\begin{equation}
+\sum_x \sum_{x'} P(x) P(x') P(d|x,c) P(d|x',c) x x' \le \left(\sum_x P(x) P(d|x,c)\right)^2=P_d^2.
+\end{equation}
+
+The triple integral in~\eq{multiutility} is much more challenging.  It can be expressed as
+\begin{equation}
+\iiint P(x) P(d|x,c) P(x'|d,c) xx' \mathrm{d}x' \mathrm{d}d\mathrm{d}x\nonumber = \iiint P(x) P(d|x,c) \frac{P(d|x',c)P(x')}{\int P(d|x',c) P(x')\mathrm{d}x'} xx' \mathrm{d}x' \mathrm{d}d\mathrm{d}x.
+\end{equation}
+The integral over $d$ in this expression is difficult to compute in superposition.  So instead, we forgo directly integrating over $d$ using the quantum computer and instead compute the integrand quantumly and classically integrate over $d$.  In many models $D$ will be small ($D=2$ is not uncommon) hence a polynomial reduction in the scaling with $D$ will often not warrant the additional costs of amplitude amplification.
+
+For fixed $d$, the first step is to compute $P(d):=\int P(d|x,c) P(x)\mathrm{d}x$, which can be estimated by preparing the state
+\begin{equation}
+\sum_x \sqrt{P(x)} \ket{x} \left(\sqrt{{P(d|x,c)}}\ket{1} + \sqrt{1 -P(d|x,c)}\ket{0} \right),\label{eq:update1}
+\end{equation}
+and estimating, $P(d)$, the probability that the right--most qubit is $1$, which is the required probability.   This can be learned within error $\epsilon$ using amplitude estimation, which requires $\tilde{O}(1/\epsilon)$ queries to the initial state and the likelihood oracle~\cite{BHT+00}.
+
+
+For simplicity let us define the integral to be $N(d|c)/P(d)$ and the approximation to the integral as $\tilde{N}(D|c)/\tilde{P}(d)$.  We then see from the triangle inequality that if we estimate the denominator to within error $\epsilon_0\le P(d)/2$ then
+\begin{align}
+\left|\frac{\tilde{N}(d|c)}{\tilde{P}(d)} -\frac{{N}(d|c)}{{P}(d)}\right|&\le \left|\frac{\tilde{N}(d|c)}{\tilde{P}(d)} -\frac{{N}(d|c)}{\tilde {P}(d)}\right|+\left|\frac{{N}(d|c)}{\tilde{P}(d)} -\frac{{N}(d|c)}{{P}(d)}\right|.\nonumber\\
+&\le \frac{1}{P(d)-\epsilon_0}\left|{\tilde{N}(d|c)} -{{N}(d|c)}{}\right|+P(d)^2\left|\frac{1}{\tilde{P}(d)} -\frac{1}{{P}(d)}\right|\nonumber\\
+&\le \frac{2}{P(d)}\left|{\tilde{N}(d|c)} -{{N}(d|c)}{}\right|+P(d)\left|\frac{1}{1-\epsilon_0/P(d)} -1\right|\nonumber\\
+&\le \frac{2}{P(d)}\left|{\tilde{N}(d|c)} -{{N}(d|c)}{}\right|+\epsilon_0.\label{eq:2IntegralTerms}
+\end{align}
+Therefore under these assumptions it is necessary to estimate $N(d|c)$ to within error $O(\epsilon_0/P(d))$ to achieve error $O(\epsilon_0)$.
+We can accelerate this inference process by observing that 
+\begin{equation}
+N(d|c)\le (P(d)+\epsilon_0)^2\in O(P^2(d)),
+\end{equation}
+since $\epsilon_0 \le P(d)/2$.  \thm{priorAmpEst} can then be used to estimate $N(d|c)$ within error $\delta$ using $\tilde O(P(d)/\delta)$ queries.  Since we need error $\epsilon_0P(d)$ the number of query operations needed to infer $N(d|c)$ within error $\epsilon_0$ is in $\tilde O(1/\epsilon_0)$.  This process needs to be repeated classically $D$ times so the total cost is $\tilde O(D/\epsilon_0)$ for this step as well.  Thus we see from~\eq{2IntegralTerms} that the total error can be made less than $\epsilon_0$, with high probability, using a number of queries that scales as $\tilde{O}(D/\epsilon)$.
+
+
+
+%Therefore, if we use amplitude amplification to boost the upper bound on the probability to $1$ and then use amplitude estimation to learn the amplified %probability, the average number of queries needed to learn this quantity within the desired accuracy is $\tilde{O}(1/\epsilon)$.  The classical integration loop %requires that we repeat this process $D$ times, and so the resultant complexity is $\tilde O(D/\epsilon)$.
+
+The analysis of the quadrouple integral is exactly the same and requires $\tilde O(D/\epsilon)$ queries on average.  Thus the cost of evaluating the utility function to within error $\epsilon$ with high probability is $\tilde O(D/\epsilon)$.  
+
+Given an algorithm that can compute $U(c)$ using a number of queries that scales as $\tilde{O}(D/\epsilon)$, we can estimate the derivative using a centered difference formula.  In particular we know that
+
+\begin{equation}
+\left|\frac{\partial U(c)}{\partial c_j}-\frac{U(c+\delta_j)-U(c-\delta_j)}{2\delta} \right|\le \max_{c,j} \left|\frac{\partial^3 U(c)}{\partial c_j^3} \right|\frac{\delta^2}{6},
+\end{equation}
+where $|\delta_j|=\delta$ and $\delta_j$ is a vector parallel to the unit vector $c_j$.
+Since we cannot compute $U(c\pm\delta_j)$ exactly, the error we want to bound is
+\begin{align}
+&\left|\frac{\partial U(c)}{\partial c_j}-\frac{\tilde U(c+\delta_j)-\tilde U(c-\delta_j)}{2\delta} \right|\nonumber \\
+&\qquad \le \left|\frac{\partial U(c)}{\partial c_j}-\frac{ U(c+\delta_j)- U(c-\delta_j)}{2\delta} \right|+\left|\frac{ U(c+\delta_j)- U(c-\delta_j)}{2\delta}-\frac{ \tilde U(c+\delta_j)- \tilde U(c-\delta_j)}{2\delta} \right|,
+\end{align}
+where $\tilde U$ is the approximation to the utility function that has error at most $\epsilon_0$.  The error is then
+\begin{equation}
+O\left(\max_{c,j} \left|\frac{\partial^3 U(c)}{\partial c_j^3} \right|{\delta^2}+\frac{\epsilon_0}{\delta}\right).
+\end{equation}
+Since $\delta$ is a free parameter that we will choose to make both sources of error equivalent.  This corresponds to $\delta= \epsilon_0^{1/3}/\max_{c,j} \left|\frac{\partial^3 U(c)}{\partial c_j^3} \right|^{1/3}$.  This gives an overall error of
+\begin{equation}
+O\left({\epsilon_0^{2/3}}{\max_{c,j}\left|\frac{\partial^3 U(c)}{\partial c_j^3} \right|^{1/3}} \right).
+\end{equation}
+If we wish to make this error $\epsilon$ then it suffices to take $\epsilon_0 = \epsilon^{3/2}/\sqrt{\max_{c,j}\left|\frac{\partial^3 U(c)}{\partial c_j^3} \right|}$.  Since the cost of computing $U(c\pm \delta_j)$ within error $\epsilon_0$ with high probability is $\tilde O(D/\epsilon_0)$ the cost estimates follow.
+\end{proof}
+
+This shows that we can use quantum techniques to achieve a polynomial speedup over classical methods for computing the gradient using sampling, which would require $O(D/\epsilon_0^2)$ queries.  It is also worth noting that high--order methods for estimating the gradient may be useful for further improving the error scaling.
+
+Another interesting feature of this approach is that we do not explicitly use the qubit string representation for the likelihood to prepare states such as~\eq{update1}.   Similar states could therefore also be prepared for problems such as quantum Hamiltonian learning~\cite{WGF+14} by eschewing a digital oracle and instead using a quantum simulation circuit that marks parts of the quantum state that correspond to measurement outcome $d$ being observed.  This means that these algorithms can be used in concert with quantum Hamiltonian learning ideas to efficiently optimize experimental design, whereas no efficient classical method exists to do so because of the expense of simulation.
 
 \end{document}
