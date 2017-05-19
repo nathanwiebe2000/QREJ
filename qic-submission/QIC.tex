@@ -313,7 +313,7 @@ Next the right most qubit register is measured and if a result of $1$ is obtaine
 \end{equation}
 which gives a probability distribution that corresponds to that expected by Bayes' rule.  The probability of this occurring is $\sum_x P(x) P(E|x) /\Gamma_E = \langle P(x), P(E|x) \rangle / \Gamma_E$.
 
-Since the process is heralded and the initial state preparation process is unitary, amplitude amplification can be used to reduce the expected number of calls to the oracles quadratically~\cite{BHM+02}.  Thus the average number of queries is in $O(\sqrt{\Gamma_E/\langle P(x), P(E|x)\rangle})$ as claimed.
+Since the process is heralded and the initial state preparation process is unitary, amplitude amplification can be used to reduce the expected number of calls to the oracles quadratically~\cite{BHM+02}.  Thus the average number of queries is in $O(\sqrt{\Gamma_E/\langle P(x), P(E|x)\rangle})$
 }
 
 If the Bayesian algorithm is used solely to post--process information then one update will suffice to give the posterior distribution.  In online settings many updates will be needed to reach the final posterior distribution.  If $L$ updates are required then the probability of all such updates succeeding given a sequence of observed variables $E_1,\ldots,E_L$ is at most
@@ -360,7 +360,7 @@ It is then easy to see that $P(1|x)=O_G(x)$ and thus a likelihood evaluation is 
 \item Output all $x$ such that $P(x|E)=1/m$.
 \end{enumerate}
 
-The validity of this algorithm is easy to verify from~\eq{Bayes} and it is clear that the posterior distribution is a uniform distribution over $x\in X_m$.  Since $|X_m|=m$ and $P(x)$ is uniform, all elements in the support of the posterior distribution have probability $1/m$ and thus Grover's problem can be solved using Bayesian inference.  This algorithm will succeed classically using $N$ queries to $O_G$, rather than the $N-m$ queries required in the worst case scenario if a Bayesian framework is not adopted.
+The validity of this algorithm is easy to verify from~\eq{Bayes} and it is clear that the posterior distribution is a uniform distribution over $x\in X_m$.  Since $|X_m|=m$ and $P(x)$ is uniform, all elements in the support of the posterior distribution have probability $1/m$ and thus Grover's problem can be solved using Bayesian inference.  This algorithm will succeed classically using $N$ queries to $O_G$, rather than the $N-m$ queries required in the worst case scenario if a Bayesian framework is not adopted
 }
 
 This reduction of Grover's problem to Bayesian inference brings with it tight lower bounds on the query complexity of solving the problem~\cite{BGH+96}.  We can exploit these bounds to show limitations on quantum systems ability to perform Bayesian inference and correct erroneous measurements that occur in the application of the method of~\lem{rejection}.  The following theorem states two such restrictions, which show that the method of~\lem{rejection} cannot be trivially improved nor can its failures be inexpensively corrected. 
@@ -409,7 +409,7 @@ because $\sqrt{|\alpha_x^{(m)}|^2 P(1|x)}\ge \sqrt{|\alpha_x|^2 P(1|x)}$ for any
 Since $O(\log(N))$ successful quantum updates are made in the inference process, the marked state can be inferred within probability $p\in \Theta(1)$ using $o(\sqrt{N})$ queries to the likelihood function.  A
 to the likelihood function is equivalent to a query to Grover's oracle and thus error correction method $H$ (described in 2) is impossible.
 
-Finally, the impossibility of method $I$ directly follows from~\lem{reduce} and lower bounds on Grover's search.
+Finally, the impossibility of method $I$ directly follows from~\lem{reduce} and lower bounds on Grover's search
 }
 
 These impossibility results show that the quantum updating procedure of~\cite{LYC14} and~\lem{rejection} cannot be improved  without making assumptions about the underlying prior distributions or likelihood functions.  From this we conclude that quantum Bayesian updating, as per~\defn{qbayes}, is inefficient in general.  This means that small quantum systems that attempt to store the prior and posterior vectors as a quantum state vector cannot do so efficiently, let alone output salient properties of the state, without making such assumptions.
@@ -486,7 +486,7 @@ The probability of measuring $1$ is
 \end{equation}
 This probability can be learned within additive error $\delta$ using $O(1/\delta^2)$ samples and hence $\bra{\psi} \Lambda \ket{\psi}-\lambda_0$ can be learned within error $\epsilon$ using $O(\Delta \lambda^2 /\epsilon^2)$ samples.
 
-This probability can also be learned using the amplitude estimation algorithm.  Amplitude estimation requires that we mark a set of states in order to estimate the probability of measuring a state within that set.  Here we mark all states in~\eq{mark} where the rightmost qubit is $1$. The amplitude estimation algorithm then requires $O(1/\delta)$ queries to $U$ and the above state preparation method to estimate the probability to within error $\delta$ and store it in a qubit register~\cite{BHM+02}.  Amplitude estimation has a probability of success of at least $8/\pi^2$.  The result then follows from taking $\delta=\epsilon/\Delta \lambda$.
+This probability can also be learned using the amplitude estimation algorithm.  Amplitude estimation requires that we mark a set of states in order to estimate the probability of measuring a state within that set.  Here we mark all states in~\eq{mark} where the rightmost qubit is $1$. The amplitude estimation algorithm then requires $O(1/\delta)$ queries to $U$ and the above state preparation method to estimate the probability to within error $\delta$ and store it in a qubit register~\cite{BHM+02}.  Amplitude estimation has a probability of success of at least $8/\pi^2$.  The result then follows from taking $\delta=\epsilon/\Delta \lambda$
 }
 %
 %\lem{ampest} is crucial for our arguments because it provides a method for learning not just the mean of the posterior distribution but also the standard deviation.  This allows us to infer a two parameter model for the posterior distribution in cases where the model is one--dimensional.
@@ -534,8 +534,9 @@ If we estimate $P(1)$ and $P(11)$ within error $O(\delta)$ then the error in $\l
 \tilde{O} \left(\frac{\Gamma_E \Delta \lambda}{\epsilon \sum_x P(x) P(E|x)} \right).
 \end{equation}
 Here the $\tilde{O}(\cdot)$ is used to remove log-factors that arise from use of the Chernoff bound to boost the probability of success to near-unity.
-The result then follows from noting that there are $O(D^2)$ different values of $k$ that need to be computed to learn the expectation values needed to compute the components of the posterior mean and covariance matrix.
+The result then follows from noting that there are $O(D^2)$ different values of $k$ that need to be computed to learn the expectation values needed to compute the components of the posterior mean and covariance matrix
 }
+
 This shows that if we require modest relative error (i.e. $\Delta \lambda \in O(\epsilon)$) and $\Gamma_E$ is reasonably tight then this process is highly efficient.  In contrast, previous results that do not use these factors that incorporate apriori knowledge of the scale of these terms may not be efficient under such assumptions.
 
 Below we combine these ideas to construct an online quantum algorithm that is capable of efficiently processing a series of $L$ pieces of data before outputting a classical model for the posterior distribution in the quantum device.  This result is key to our argument because it provides a result that one can fall back on if an update fails, thereby removing the problem of exponentially shrinking success probability at the price of only retaining incomplete information about the posterior distribution.
@@ -559,7 +560,7 @@ After step 1, we have from the independence of the successes that the probabilit
 \tilde{O} \left(\frac{LD^2 \Delta \lambda }{\epsilon \langle  P(x), \prod_{k=1}^LP(E_k|x)/\Gamma_{E_k}\rangle} \right)
 \end{equation}
 
-Finally, since the algorithm outputs the mean and covariance matrix of the posterior distribution, it yields the parameterization of a function $f\in F(x;\mu,\sigma)$ that captures (to within error $\epsilon$) the first two moments of the posterior distribution.  Thus the algorithm clearly performs a semi--classical update as per~\defn{semi}.
+Finally, since the algorithm outputs the mean and covariance matrix of the posterior distribution, it yields the parameterization of a function $f\in F(x;\mu,\sigma)$ that captures (to within error $\epsilon$) the first two moments of the posterior distribution.  Thus the algorithm clearly performs a semi--classical update as per~\defn{semi}
 }
 
 The complexity of the above approximate quantum inference algorithm cannot be easily compared to that of exact Bayesian inference because both algorithms
@@ -603,7 +604,7 @@ m > \frac{1}{2}\left(\frac{\pi}{2\sin^{-1}(\sqrt{a})}-1\right)\label{eq:mvalid}
 \begin{equation}
 \tilde O\left(\frac{1}{\epsilon m} \right) \in \tilde O\left(\frac{\sqrt{a_0}}{\epsilon} \right),
 \end{equation}
-as claimed.
+as claimed
 }
 
 This lemma is significant because it shows that if the scale of a probability that you wish to estimate is known then you can use amplitude amplification to boost the probability of success to $O(1)$ prior to estimating the probability.  This can lead to a quadratic reduction in the cost of estimation if a constant number of bits of significance are required.
@@ -668,8 +669,185 @@ We would like to thank J. Combes and J. Yard for valuable feedback and discussio
 
 \nonumsection{References}
 \noindent
-\bibliographystyle{unsrt}
-\bibliography{qsmc2}
+%\bibliographystyle{unsrt}
+%\bibliography{qsmc2}
+\begin{thebibliography}{10}
+
+\bibitem{shor1994algorithms}
+Peter~W Shor.
+\newblock Algorithms for quantum computation: Discrete logarithms and
+  factoring.
+\newblock In {\em Foundations of Computer Science, 1994 Proceedings., 35th
+  Annual Symposium on}, pages 124--134. IEEE, 1994.
+
+\bibitem{lloyd1996universal}
+Seth Lloyd et~al.
+\newblock Universal quantum simulators.
+\newblock {\em Science}, 273:1073--1077, 1996.
+
+\bibitem{childs2003exponential}
+Andrew~M Childs, Richard Cleve, Enrico Deotto, Edward Farhi, Sam Gutmann, and
+  Daniel~A Spielman.
+\newblock Exponential algorithmic speedup by a quantum walk.
+\newblock In {\em Proceedings of the thirty-fifth annual ACM symposium on
+  Theory of computing}, pages 59--68. ACM, 2003.
+
+\bibitem{HHL09}
+Aram~W Harrow, Avinatan Hassidim, and Seth Lloyd.
+\newblock Quantum algorithm for linear systems of equations.
+\newblock {\em Physical Review Letters}, 103(15):150502, 2009.
+
+\bibitem{aaronson_learnability_2007}
+Scott Aaronson.
+\newblock The learnability of quantum states.
+\newblock {\em Proceedings of the Royal Society A: Mathematical, Physical and
+  Engineering Science}, 463(2088):3089--3114, December 2007.
+
+\bibitem{granade_robust_2012}
+Christopher~E Granade, Christopher Ferrie, Nathan Wiebe, and D~G Cory.
+\newblock Robust online {{Hamiltonian}} learning.
+\newblock {\em New Journal of Physics}, 14(10):103013, October 2012.
+
+\bibitem{ferrie_likelihood-free_2014}
+Christopher Ferrie and Christopher~E. Granade.
+\newblock Likelihood-free methods for quantum parameter estimation.
+\newblock {\em Physical Review Letters}, 112(13):130402, April 2014.
+
+\bibitem{aimeur2006machine}
+Esma A{\"\i}meur, Gilles Brassard, and S{\'e}bastien Gambs.
+\newblock Machine learning in a quantum world.
+\newblock In {\em Advances in Artificial Intelligence}, pages 431--442.
+  Springer, 2006.
+
+\bibitem{wiebe_quantum_2014}
+Nathan Wiebe, Ashish Kapoor, and Krysta~M Svore.
+\newblock Quantum deep learning.
+\newblock {\em arXiv preprint arXiv:1412.3489}, 2014.
+
+\bibitem{wiebe2014quantum}
+Nathan Wiebe, Ashish Kapoor, and Krysta Svore.
+\newblock Quantum nearest-neighbor algorithms for machine learning.
+\newblock {\em arXiv preprint arXiv:1401.2142}, 2014.
+
+\bibitem{lloyd2013quantum}
+Seth Lloyd, Masoud Mohseni, and Patrick Rebentrost.
+\newblock Quantum algorithms for supervised and unsupervised machine learning.
+\newblock {\em arXiv preprint arXiv:1307.0411}, 2013.
+
+\bibitem{lloyd2014quantum}
+Seth Lloyd, Masoud Mohseni, and Patrick Rebentrost.
+\newblock Quantum principal component analysis.
+\newblock {\em Nature Physics}, 10(9):631--633, 2014.
+
+\bibitem{boixo2015fast}
+Sergio Boixo, Gerardo Ortiz, and Rolando Somma.
+\newblock Fast quantum methods for optimization.
+\newblock {\em The European Physical Journal Special Topics}, 224(1):35--49,
+  2015.
+
+\bibitem{LYC14}
+Guang~Hao Low, Theodore~J Yoder, and Isaac~L Chuang.
+\newblock Quantum inference on bayesian networks.
+\newblock {\em Physical Review A}, 89(6):062315, 2014.
+
+\bibitem{ORR13}
+Maris Ozols, Martin Roetteler, and J{\'e}r{\'e}mie Roland.
+\newblock Quantum rejection sampling.
+\newblock {\em ACM Transactions on Computation Theory (TOCT)}, 5(3):11, 2013.
+
+\bibitem{BHM+02}
+Gilles Brassard, Peter Hoyer, Michele Mosca, and Alain Tapp.
+\newblock Quantum amplitude amplification and estimation.
+\newblock {\em Contemporary Mathematics}, 305:53--74, 2002.
+
+\bibitem{Gro96}
+Lov~K Grover.
+\newblock A fast quantum mechanical algorithm for database search.
+\newblock In {\em Proceedings of the twenty-eighth annual ACM symposium on
+  Theory of computing}, pages 212--219. ACM, 1996.
+
+\bibitem{BGH+96}
+Michel Boyer, Gilles Brassard, Peter H{\o}yer, and Alain Tapp.
+\newblock Tight bounds on quantum searching.
+\newblock {\em arXiv preprint quant-ph/9605034}, 1996.
+
+\bibitem{dagum1993approximating}
+Paul Dagum and Michael Luby.
+\newblock Approximating probabilistic inference in bayesian belief networks is
+  {NP}-hard.
+\newblock {\em Artificial Intelligence}, 60(1):141--153, 1993.
+
+\bibitem{liu_combined_2001}
+Jane Liu and Mike West.
+\newblock Combined parameter and state estimation in simulation-based
+  filtering.
+\newblock In De~Freitas and NJ~Gordon, editors, {\em Sequential Monte Carlo
+  Methods in Practice}. Springer-Verlag, New York, 2001.
+
+\bibitem{minka2001expectation}
+Thomas~P Minka.
+\newblock Expectation propagation for approximate bayesian inference.
+\newblock In {\em Proceedings of the Seventeenth conference on Uncertainty in
+  artificial intelligence}, pages 362--369. Morgan Kaufmann Publishers Inc.,
+  2001.
+
+\bibitem{van2000unscented}
+Rudolph Van Der~Merwe, Arnaud Doucet, Nando De~Freitas, and Eric Wan.
+\newblock The unscented particle filter.
+\newblock In {\em NIPS}, pages 584--590, 2000.
+
+\bibitem{GR02}
+Lov Grover and Terry Rudolph.
+\newblock Creating superpositions that correspond to efficiently integrable
+  probability distributions.
+\newblock {\em arXiv preprint quant-ph/0208112}, 2002.
+
+\bibitem{scarani2005quantum}
+Valerio Scarani, Sofyan Iblisdir, Nicolas Gisin, and Antonio Acin.
+\newblock Quantum cloning.
+\newblock {\em Reviews of Modern Physics}, 77(4):1225, 2005.
+
+\bibitem{aharonov2006polynomial}
+Dorit Aharonov, Vaughan Jones, and Zeph Landau.
+\newblock A polynomial quantum algorithm for approximating the jones
+  polynomial.
+\newblock In {\em Proceedings of the thirty-eighth annual ACM symposium on
+  Theory of computing}, pages 427--436. ACM, 2006.
+
+\bibitem{wiebe2015bayesian}
+Nathan Wiebe, Christopher Granade, Ashish Kapoor, and Krysta~M Svore.
+\newblock Bayesian inference via rejection filtering.
+\newblock {\em arXiv preprint arXiv:1511.06458}, 2015.
+
+\bibitem{WHW15}
+Dave Wecker, Matthew~B Hastings, Nathan Wiebe, Bryan~K Clark, Chetan Nayak, and
+  Matthias Troyer.
+\newblock Solving strongly correlated electron models on a quantum computer.
+\newblock {\em arXiv preprint arXiv:1506.05135}, 2015.
+
+\bibitem{yoder2014fixed}
+Theodore~J Yoder, Guang~Hao Low, and Isaac~L Chuang.
+\newblock Fixed-point quantum search with an optimal number of queries.
+\newblock {\em Physical review letters}, 113(21):210501, 2014.
+
+\bibitem{isard_condensationconditional_1998}
+Michael Isard and Andrew Blake.
+\newblock {CONDENSATION}—{Conditional} {Density} {Propagation} for {Visual}
+  {Tracking}.
+\newblock {\em International Journal of Computer Vision}, 29(1):5--28, August
+  1998.
+
+\bibitem{BHT+00}
+Gilles Brassard, Peter Hoyer, Michele Mosca, and Alain Tapp.
+\newblock Quantum amplitude amplification and estimation.
+\newblock {\em arXiv preprint quant-ph/0005055}, 2000.
+
+\bibitem{WGF+14}
+Nathan Wiebe, Christopher Granade, Christopher Ferrie, and DG~Cory.
+\newblock Hamiltonian learning and certification using quantum resources.
+\newblock {\em Physical Review Letters}, 112(19):190501, 2014.
+
+\end{thebibliography}
 
 
 %% APPENDIX %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -706,7 +884,7 @@ Following the same argument it is clear that there exist $0\le c_y<1$ such that 
 \begin{equation}
 \left(\ket{x} + \sum_{y\ne x}a_y c_y\delta \ket{y}\right)\left(\bra{x} + \sum_{y\ne x}c_y\delta \bra{y}\right) + O(\delta^2),
 \end{equation}
-It is clear that the resultant state can be written in the form is $\ket{x} + c\delta \ket{\psi} + O(\delta^2)$ where $0\le c\le \max_y c_y < 1$.  This shows that the algorithm converges to $\ket{x}$ even if the initial perturbation is a superposition of basis states.
+It is clear that the resultant state can be written in the form is $\ket{x} + c\delta \ket{\psi} + O(\delta^2)$ where $0\le c\le \max_y c_y < 1$.  This shows that the algorithm converges to $\ket{x}$ even if the initial perturbation is a superposition of basis states
 }
 
 
@@ -805,7 +983,7 @@ Eq.~\eq{assumption} is a key assumption behind~\eq{Deltaxbd}.  It is then easy t
 \begin{equation}
 \epsilon \le \frac{\langle P(E|x),P(x)\rangle^2+ 3D\Lambda}{2 D\Lambda\langle P(E|x),P(x)\rangle},
 \end{equation}
-as claimed.
+as claimed
 }
 
 This theorem shows that if the derivatives of the likelihood function are large or the inner product between the prior and the likelihood function is small then the errors incurred by updating can be potentially large.  These errors can be combated by making $\Delta x$ small.  This is potentially expensive since $\Delta x = N^{-D}$ where $N$ is the number of points in the mesh approximating the posterior.
@@ -818,8 +996,9 @@ D \left\lceil\log_2\left(\max_E \frac{\langle P(E|x),P(x)\rangle^2+3{D} \Lambda}
 $$
 \end{corollary}
 \proof{
-Proof is an immediate consequence of substituting $\Delta x =1/N^{1/D}$ into~\thm{errbd} and solving for $N$.
+Proof is an immediate consequence of substituting $\Delta x =1/N^{1/D}$ into~\thm{errbd} and solving for $N$
 }
+
 This shows that the number of qubits needed is at most logarithmic in the error.  Furthermore, if $L$ updates are required then the total cost is increased by at most an additive factor of $\log(L)$.  We do not include this in our cost estimates since this error estimate is needlessly pessimistic as Bayesian inference is insensitive to the initial prior according to the Bernstein von-Mises theorem and consequently such errors are unlikely to be additive.
 
 
@@ -920,7 +1099,7 @@ Notice that Bayes updating the quantum SMC state consists of pointwise multiplic
 \end{align*}
 If $1$ is measured then the result will implement the circular convolution $P \star Q$ according to~\eq{conv} and Plancherel's theorem.
 
-First, the query complexity of this algorithm is easy to estimate.  The initial state preparation requires a query to $O_{\rm in}$ and the calculation of $\hat{Q}(k)$ requires a query to $P_{\hat{Q}}$.  By using amplitude amplification on the $1$ result, we have that on average $O(\sqrt{\Gamma_E/ \langle \mathcal{F}(P), \mathcal{F}(Q)}\rangle)$ queries are required to prepare the state.
+First, the query complexity of this algorithm is easy to estimate.  The initial state preparation requires a query to $O_{\rm in}$ and the calculation of $\hat{Q}(k)$ requires a query to $P_{\hat{Q}}$.  By using amplitude amplification on the $1$ result, we have that on average $O(\sqrt{\Gamma_E/ \langle \mathcal{F}(P), \mathcal{F}(Q)}\rangle)$ queries are required to prepare the state
 }
 
 
@@ -1082,7 +1261,7 @@ Since $\delta$ is a free parameter that we will choose to make both sources of e
 \begin{equation}
 O\left({\epsilon_0^{2/3}}{\max_{c,j}\left|\frac{\partial^3 U(c)}{\partial c_j^3} \right|^{1/3}} \right).
 \end{equation}
-If we wish to make this error $\epsilon$ then it suffices to take $\epsilon_0 = \epsilon^{3/2}/\sqrt{\max_{c,j}\left|\frac{\partial^3 U(c)}{\partial c_j^3} \right|}$.  Since the cost of computing $U(c\pm \delta_j)$ within error $\epsilon_0$ with high probability is $\tilde O(D/\epsilon_0)$ the cost estimates follow.
+If we wish to make this error $\epsilon$ then it suffices to take $\epsilon_0 = \epsilon^{3/2}/\sqrt{\max_{c,j}\left|\frac{\partial^3 U(c)}{\partial c_j^3} \right|}$.  Since the cost of computing $U(c\pm \delta_j)$ within error $\epsilon_0$ with high probability is $\tilde O(D/\epsilon_0)$ the cost estimates follow
 }
 
 This shows that we can use quantum techniques to achieve a polynomial speedup over classical methods for computing the gradient using sampling, which would require $O(D/\epsilon_0^2)$ queries.  It is also worth noting that high--order methods for estimating the gradient may be useful for further improving the error scaling.
